@@ -136,7 +136,7 @@ export default function Login() {
     try {
       const res = await axios.post("/auth/login", { email, password });
       toast.success("Login successful", { placement: "top-right" });
-
+      localStorage.setItem("user", JSON.stringify(res.data));
       const role = res.data.role;
       if (role === "student") navigate("/student");
       else if (role === "supervisor") navigate("/supervisor");

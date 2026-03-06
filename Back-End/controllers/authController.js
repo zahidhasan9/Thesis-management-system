@@ -58,3 +58,15 @@ exports.login = async(req,res)=>{
  res.json(user)
 
 }
+
+exports.logout = async (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: false, // same as your login cookie
+    domain: "localhost", // must match cookie domain
+    sameSite: "lax",    // must match cookie SameSite
+    path: "/",          // match path
+  });
+
+  res.status(200).json({ message: "Logged out successfully" });
+};
