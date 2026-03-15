@@ -10,12 +10,13 @@ const userSchema = new mongoose.Schema({
  },
 
  phone:String,
+ idNo:String,
 
  password:String,
 
  role:{
   type:String,
-  enum:["student","supervisor","evaluator","admin"],
+  enum:["student","supervisor","evaluator","admin,third_evaluator"],
   default:"student"
  },
 

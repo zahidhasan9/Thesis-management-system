@@ -121,6 +121,7 @@ console.log("thesis", thesis);
       .catch(() => toast.error("Failed to delete thesis"));
   };
 
+  
   const navItems = [
     // { name: "Dashboard", route: "/dashboard" },
     { name: "Upload Thesis", route: "/upload" },

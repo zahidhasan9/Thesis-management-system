@@ -6,6 +6,7 @@ import Home from "./pages/homepage/Home"
 
 import StudentDashboard from "./pages/student/StudentDashboard"
 import UploadThesis from "./pages/student/UploadThesis"
+import Profile from "./pages/student/Profile"
 
 import SupervisorDashboard from "./pages/supervisor/SupervisorDashboard"
 import EvaluatorDashboard from "./pages/evaluator/EvaluatorDashboard"
@@ -27,9 +28,17 @@ function App() {
 
         <Route path="/supervisor" element={<SupervisorDashboard/>} />
 
-        <Route path="/evaluator" element={<EvaluatorDashboard/>} />
-
+        {/* <Route path="/evaluator" element={<EvaluatorDashboard/>} /> */}
         {/* <Route path="/admin" element={<AdminDashboard/>} /> */}
+
+
+
+        <Route 
+         path="/evaluator"element={
+        <ProtectedRoute roles={["evaluator","third_evaluator"]}><EvaluatorDashboard/> 
+        </ProtectedRoute>
+         }/>
+         
         <Route 
          path="/admin"element={
         <ProtectedRoute roles={["admin"]}><AdminDashboard />
@@ -47,8 +56,11 @@ function App() {
         <ProtectedRoute roles={["student"]}><UploadThesis />
         </ProtectedRoute>
          }/>
-
-         
+          <Route
+         path="/profile"element={
+        <ProtectedRoute roles={["student"]}><Profile />
+        </ProtectedRoute>
+         }/>
 
       </Routes>
 

@@ -19,6 +19,11 @@ const thesisSchema = new mongoose.Schema({
 
  supervisorNote:String,
 
+  evaluators:[{
+  type:mongoose.Schema.Types.ObjectId,
+  ref:"User"
+ }],
+
  evaluatorMarks:[
   {
    evaluator:{
@@ -29,6 +34,14 @@ const thesisSchema = new mongoose.Schema({
   }
  ],
 
+  // Third evaluator mark (optional)
+ thirdEvaluatorMark: {
+  evaluator: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+  mark: Number
+ },
+
+ // Final mark after calculation
+//  finalMark: { type: Number, default: null }
  finalMark:Number
 
 },{timestamps:true})

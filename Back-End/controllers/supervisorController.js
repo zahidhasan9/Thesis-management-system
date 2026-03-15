@@ -1,13 +1,5 @@
 const Thesis = require("../models/Thesis")
 
-// exports.getAllThesis = async(req,res)=>{
-
-//  const thesis = await Thesis.find()
-//  .populate("student")
-
-//  res.json(thesis)
-
-// }
 
 exports.getAllThesis = async(req,res)=>{
 
@@ -43,5 +35,23 @@ exports.reviewThesis = async(req,res)=>{
  )
 
  res.json(thesis)
+
+}
+
+
+exports.assignEvaluators = async(req,res)=>{
+
+ const {thesisId,evaluators} = req.body
+
+ const thesis = await Thesis.findById(thesisId)
+
+ thesis.evaluators = evaluators
+
+ await thesis.save()
+
+ res.json({
+  message:"Evaluators assigned",
+  thesis
+ })
 
 }

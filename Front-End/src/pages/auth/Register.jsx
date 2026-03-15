@@ -9,17 +9,19 @@ export default function Register() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [idNo, setIdNo] = useState("");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
 
   const register = async () => {
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !idNo || !phone) {
       toast.error("Please fill all fields");
       return;
     }
 
     setLoading(true);
     try {
-      await axios.post("/auth/register", { name, email, password });
+      await axios.post("/auth/register", { name, email, password, idNo, phone });
       toast.success("Registered successfully");
       navigate("/"); // register successful -> go to login page
     } catch (err) {
@@ -62,6 +64,21 @@ export default function Register() {
             />
           </div>
 
+           <div className="flex flex-col mb-4">
+            <label htmlFor="idNo" className="mb-2 font-medium">
+              ID Number <span className="text-sm text-gray-500">(Optional)</span>
+            </label>
+
+            <input
+              id="idNo"
+              type="text"
+              placeholder="Enter your ID (optional)"
+              value={idNo}
+              onChange={(e) => setIdNo(e.target.value)}
+              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+           </div>
+
           <div className="flex flex-col mb-4">
             <label htmlFor="email" className="mb-2 font-medium">Email</label>
             <input
@@ -70,6 +87,20 @@ export default function Register() {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+            />
+          </div>
+
+         
+
+          <div className="flex flex-col mb-4">
+            <label htmlFor="phone" className="mb-2 font-medium">phone</label>
+            <input
+              id="phone"
+              type="number"
+              placeholder="Enter your phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
               className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
