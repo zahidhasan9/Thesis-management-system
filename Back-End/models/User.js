@@ -11,8 +11,12 @@ const userSchema = new mongoose.Schema({
 
  phone:String,
  idNo:String,
-
+ department: { type: String },
+ batch:String,
+ Section:String,
+ position:String, // For supervisors: Professor, Associate Professor, etc.
  password:String,
+ bio:String ,
 
  role:{
   type:String,

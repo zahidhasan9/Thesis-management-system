@@ -3,6 +3,7 @@ const cookieParser = require("cookie-parser")
 const cors = require("cors")
 const helmet = require("helmet")
 const morgan = require("morgan")
+const path = require("path");
 
 const authRoutes = require("./routes/authRoutes")
 const adminRoutes = require("./routes/adminRoutes")
@@ -15,6 +16,9 @@ app.use(cors({
   origin: "http://localhost:5173", // frontend URL
   credentials: true,               // allow cookies/auth headers
 }));
+
+//  Static files (PDF serve) 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 app.use(express.json())
 app.use(cookieParser())

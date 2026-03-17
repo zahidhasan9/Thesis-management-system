@@ -17,4 +17,16 @@ router.patch("/review",
  supervisor.reviewThesis
 )
 
+router.get("/thesis/:id", protect,
+    allowRoles("supervisor"), 
+    supervisor.getSingleThesis);
+
+// Get supervisor profile
+router.get("/profile", protect, allowRoles("supervisor"),  supervisor.getProfile);
+
+// Update supervisor profile
+router.patch("/profile", protect, allowRoles("supervisor"), supervisor.updateProfile);
+
+
+
 module.exports = router

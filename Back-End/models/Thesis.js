@@ -8,12 +8,16 @@ const thesisSchema = new mongoose.Schema({
   type:mongoose.Schema.Types.ObjectId,
   ref:"User"
  },
+ supervisor:{
+  type:mongoose.Schema.Types.ObjectId,
+  ref:"User"
+ },
 
  pdf:String,
 
  status:{
   type:String,
-  enum:["pending","accepted","declined"],
+  enum:["pending","accepted","declined","completed"],
   default:"pending"
  },
 
