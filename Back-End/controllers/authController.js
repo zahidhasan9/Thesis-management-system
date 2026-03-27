@@ -16,10 +16,10 @@ exports.register = async(req,res)=>{
  const Idexist = await User.findOne({idNo})
 
  if(exist){
-  return res.json({message:"Email exists"})
+ return res.status(404).json({ message: "User not found" });
  }
 if(Idexist){
-  return res.json({message:"ID number exists"})
+  return res.status(404).json({ message: "ID number exists" });
  }
  const hash = await bcrypt.hash(password,10)
 
@@ -42,13 +42,13 @@ exports.login = async(req,res)=>{
  const user = await User.findOne({email})
 
  if(!user){
-  return res.json({message:"User not found"})
+  return res.status(404).json({ message: "User not found" });
  }
 
  const match = await bcrypt.compare(password,user.password)
 
  if(!match){
-  return res.json({message:"Wrong password"})
+  return res.status(401).json({ message: "Wrong password" })
  }
 
  const token = createToken(user._id)

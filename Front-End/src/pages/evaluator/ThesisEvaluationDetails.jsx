@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import axios from "../../api/axios";
 import Navbar from "../../components/Navbar";
 import { toast } from "sonner";
+import {FileText} from "lucide-react";
 import StatusBadge from "../../components/evaluator/StatusBadge";
 
 export default function ThesisEvaluationDetails() {
@@ -82,6 +83,11 @@ export default function ThesisEvaluationDetails() {
       setSubmitting(false);
     }
   };
+
+  const baseURL = "http://localhost:5000";
+  const pdfUrl = thesis?.pdf
+    ? `${baseURL}/${thesis.pdf.replace(/\\/g, "/")}`
+    : null;
 
   return (
     <>
@@ -167,18 +173,17 @@ export default function ThesisEvaluationDetails() {
                 </div>
               )}
 
-              {thesis.fileUrl && (
-                <div className="mt-6">
-                  <a
-                    href={thesis.fileUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-                  >
-                    View Thesis File
-                  </a>
-                </div>
-              )}
+            {pdfUrl && (
+                    <a
+                      href={pdfUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex mt-4 items-center justify-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-black transition"
+                    >
+                      <FileText className="w-4 h-4" />
+                      View PDF
+                    </a>
+                  )}
             </div>
 
             <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">

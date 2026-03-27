@@ -1,16 +1,31 @@
-exports.allowRoles = (...roles)=>{
+// exports.allowRoles = (...roles)=>{
 
- return (req,res,next)=>{
+//  return (req,res,next)=>{
 
-  if(!roles.includes(req.user.role)){
-    console.log("Role check passed for user:", req.user._id, "with role:", req.user.role);
-   return res.status(403).json({
-    message:"Access denied"
-   })
-  }
+//   if(!roles.includes(req.user.role)){
+//     console.log("Role check passed for user:", req.user._id, "with role:", req.user.role);
+//    return res.status(403).json({
+//     message:"Access denied"
+//    })
+//   }
 
-  next()
+//   next()
 
- }
+//  }
 
-}
+// }
+
+
+exports.allowRoles = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user || !req.user.role) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!roles.includes(req.user.role)) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    next();
+  };
+};

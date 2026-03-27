@@ -33,8 +33,9 @@ export default function StudentDashboard() {
     const pending = thesis.filter((t) => t.status === "pending").length;
     const accepted = thesis.filter((t) => t.status === "accepted").length;
     const declined = thesis.filter((t) => t.status === "declined").length;
+    const completed = thesis.filter((t) => t.status === "completed").length;
 
-    return { total, pending, accepted, declined };
+    return { total, pending, accepted, declined, completed };
   }, [thesis]);
 
   const getStatusBadge = (status) => {
@@ -58,6 +59,13 @@ export default function StudentDashboard() {
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 border border-red-200">
             <XCircle className="w-4 h-4" />
             Declined
+          </span>
+        );
+      case "completed":
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-300 text-blue-800 border border-blue-200">
+            <FileText className="w-4 h-4" />
+            Completed
           </span>
         );
       default:
@@ -84,6 +92,10 @@ export default function StudentDashboard() {
       toast.error("Accepted thesis cannot be deleted");
       return;
     }
+     if (status === "completed") {
+      toast.error("Completed thesis cannot be deleted");
+      return;
+    }
 
     axios
       .delete(`/student/thesis/${id}`)
@@ -98,7 +110,7 @@ export default function StudentDashboard() {
     // { name: "Upload Thesis", route: "/upload" },
     // { name: "Profile", route: "/profile" },
   ];
-console.log(thesis);
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Navbar items={navItems} portal={"Student Portal"} />
@@ -244,7 +256,7 @@ console.log(thesis);
                   <button
                     onClick={() => handleDelete(t._id, t.status)}
                     className={`flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-white transition ${
-                      t.status === "accepted"
+                      t.status === "accepted"||t.status === "completed"
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-red-600 hover:bg-red-700"
                     }`}

@@ -77,6 +77,13 @@ export default function StudentThesisDetails() {
             Declined
           </span>
         );
+          case "completed":
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-green-300 text-blue-800 border border-blue-200">
+            <FileText className="w-4 h-4" />
+            Completed
+          </span>
+        );
       default:
         return (
           <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">

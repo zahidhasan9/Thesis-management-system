@@ -29,10 +29,10 @@ router.get("/pending-third", protect, allowRoles("third_evaluator"), evaluator.g
 
 // get all accepted theses
 router.get("/accepted", protect, allowRoles("evaluator"), evaluator.getAccepted)
-router.get("/thesis/:id", protect,  evaluator.getThesisById);
+router.get("/thesis/:id", protect, allowRoles("evaluator","third_evaluator"), evaluator.getThesisById);
 
-router.get("/profile", protect, allowRoles("evaluator"), evaluator.getEvaluatorProfile); 
-router.patch("/profile", protect, allowRoles("evaluator"), evaluator.updateEvaluatorProfile); 
+router.get("/profile", protect, allowRoles("evaluator","third_evaluator"), evaluator.getEvaluatorProfile); 
+router.patch("/profile", protect, allowRoles("evaluator","third_evaluator"), evaluator.updateEvaluatorProfile); 
 
 
 module.exports = router
