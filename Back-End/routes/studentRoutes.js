@@ -39,10 +39,22 @@ router.get("/my-thesis",
  student.myThesis
 )
 
+router.get(
+  "/thesis/:id",
+  protect,
+  allowRoles("student"),
+  student.getSingleThesis
+);
+
 router.delete("/thesis/:id",
  protect,
  allowRoles("student"),
  student.deleteThesis
 )
+
+// profile
+router.get("/profile", protect, allowRoles("student"), student.getProfile);
+router.patch("/profile", protect, allowRoles("student"), student.updateProfile);
+
 
 module.exports = router

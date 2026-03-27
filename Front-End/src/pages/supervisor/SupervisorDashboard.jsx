@@ -243,7 +243,7 @@ console.log("thesis", thesis);
 
       
 
-      {/* 🔥 Chart */}
+      {/* Chart */}
       <div className="bg-white p-4 mb-8 rounded-xl shadow">
           <ResponsiveContainer width="100%" height={300}>
             <BarChart data={chartData}>
@@ -258,7 +258,7 @@ console.log("thesis", thesis);
 
 
 
-     {/* 🔥 Search + Filter */}
+     {/* Search + Filter */}
       <div className="flex gap-4 mb-4">
         <input
           className="p-2 border rounded w-1/2"
@@ -277,7 +277,7 @@ console.log("thesis", thesis);
         </select>
       </div>
 
-      {/* 🔥 Table */}
+      {/* Table */}
       <div className="bg-white rounded-xl shadow p-4 mb-6 overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-100 sticky top-0">
@@ -300,7 +300,7 @@ console.log("thesis", thesis);
           <td className="p-3">{t.student?.name}</td>
           <td className="p-3">{t.title}</td>
 
-          {/* 🔥 Status Badge */}
+          {/* Status Badge */}
           <td className="p-3">
             <span
               className={`px-2 py-1 rounded text-xs font-semibold ${

@@ -145,7 +145,7 @@ exports.getAllThesis = async (req, res) => {
 exports.getSingleThesis = async (req, res) => {
   const thesis = await Thesis.findById(req.params.id)
     .populate("student")
-    // .populate("supervisor", "name email")
+    .populate("supervisor", "name email")
     .populate("thirdEvaluatorMark.evaluator")
     .populate("evaluatorMarks.evaluator");
 

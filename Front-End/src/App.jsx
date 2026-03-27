@@ -7,13 +7,18 @@ import Home from "./pages/homepage/Home"
 import StudentDashboard from "./pages/student/StudentDashboard"
 import UploadThesis from "./pages/student/UploadThesis"
 import Profile from "./pages/student/Profile"
+import StudentThesisDetails from "./pages/student/StudentThesisDetails"
 
 import SupervisorDashboard from "./pages/supervisor/SupervisorDashboard"
 import ReviewPage from "./pages/supervisor/Review"
 import SupervisorProfile from "./pages/supervisor/SupervisorProfile"
+
 import EvaluatorDashboard from "./pages/evaluator/EvaluatorDashboard"
+import ThesisEvaluationDetails from "./pages/evaluator/ThesisEvaluationDetails"
+import EvaluatorProfile from "./pages/evaluator/Profile"
+
 import AdminDashboard from "./pages/admin/AdminDashboard"
-import ThesisDetails from "./pages/admin/ThesisDetails"
+import AdminThesisDetails from "./pages/admin/AdminThesisDetails"
 import ProtectedRoute from "./components/ProtectedRoute"
 
 function App() {
@@ -41,15 +46,26 @@ function App() {
         <ProtectedRoute roles={["evaluator","third_evaluator"]}><EvaluatorDashboard/> 
         </ProtectedRoute>
          }/>
-         
+          <Route 
+         path="/evaluator/thesis/:id"element={
+        <ProtectedRoute roles={["evaluator","third_evaluator"]}><ThesisEvaluationDetails />
+        </ProtectedRoute>
+         }/>
+          <Route
+         path="/evaluator/profile"element={
+        <ProtectedRoute roles={["evaluator","third_evaluator"]}><EvaluatorProfile />
+        </ProtectedRoute>
+         }/>
+
+
         <Route 
          path="/admin"element={
         <ProtectedRoute roles={["admin"]}><AdminDashboard />
         </ProtectedRoute>
          }/>
-          <Route 
+         <Route 
          path="/admin/thesis/:id"element={
-        <ProtectedRoute roles={["admin"]}><ThesisDetails />
+        <ProtectedRoute roles={["admin"]}><AdminThesisDetails/>
         </ProtectedRoute>
          }/>
 
@@ -67,6 +83,11 @@ function App() {
           <Route
          path="/profile"element={
         <ProtectedRoute roles={["student"]}><Profile />
+        </ProtectedRoute>
+         }/>
+         <Route
+         path="/student/thesis/:id"element={
+        <ProtectedRoute roles={["student"]}><StudentThesisDetails />
         </ProtectedRoute>
          }/>
 

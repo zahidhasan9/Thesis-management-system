@@ -132,18 +132,21 @@
 
 
 const Thesis = require("../models/Thesis");
+const User = require("../models/User");
 const calculate = require("../utils/calculateFinalMark");
 
 // Get all accepted theses
 exports.getAccepted = async (req, res) => {
   try {
-    const theses = await Thesis.find({ status: "accepted" }).populate("student");
+    const theses = await Thesis.find({
+      status: { $in: ["accepted", "completed"] },
+    }).populate("student");
+
     res.json(theses);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 };
-
 // Submit first/second evaluator mark
 exports.submitMark = async (req, res) => {
   try {
@@ -167,6 +170,11 @@ exports.submitMark = async (req, res) => {
 
     // Calculate final mark
     thesis.finalMark = calculate(thesis);
+
+     // If final mark is ready, mark thesis as completed
+    if (thesis.finalMark != null) {
+      thesis.status = "completed";
+    }
 
     await thesis.save();
     res.json({ message: "Mark submitted", thesis });
@@ -222,6 +230,11 @@ exports.submitThirdEvaluatorMark = async (req, res) => {
     // Final mark = third evaluator mark (per rule)
     thesis.finalMark = calculate(thesis);
 
+    // Mark thesis as completed
+    if (thesis.finalMark != null) {
+      thesis.status = "completed";
+    }
+
     await thesis.save();
 
     res.json({ message: "Third evaluator mark submitted", thesis });
@@ -245,6 +258,46 @@ exports.getPendingThirdEvaluator = async (req, res) => {
 
     res.json(pending);
 
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.getThesisById = async (req, res) => {
+  try {
+    const thesis = await Thesis.findById(req.params.id).populate("student");
+
+    if (!thesis) {
+      return res.status(404).json({ message: "Thesis not found" });
+    }
+
+    res.json(thesis);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+
+exports.getEvaluatorProfile = async (req, res) => {
+  try {
+    const evaluator = await User.findById(req.user.id).select("-password");
+    res.json(evaluator);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+exports.updateEvaluatorProfile = async (req, res) => {
+  try {
+    const { name, phone, department, designation, note } = req.body;
+
+    const updated = await User.findByIdAndUpdate(
+      req.user.id,
+      { name, phone, department, designation, note },
+      { new: true }
+    ).select("-password");
+
+    res.json(updated);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

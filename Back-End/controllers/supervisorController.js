@@ -63,8 +63,8 @@ exports.getSingleThesis = async (req, res) => {
     const { id } = req.params;
 
     const thesis = await Thesis.findById(id)
-      .populate("student", "name email")
-    //   .populate("supervisor", "name email");
+      .populate("student")
+      .populate("supervisor")
 
     if (!thesis) {
       return res.status(404).json({ message: "Thesis not found" });

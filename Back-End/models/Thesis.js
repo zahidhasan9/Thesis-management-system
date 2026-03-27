@@ -43,6 +43,7 @@ const thesisSchema = new mongoose.Schema({
   evaluator: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
   mark: Number
  },
+ description:String,
 
  // Final mark after calculation
 //  finalMark: { type: Number, default: null }
