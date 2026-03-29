@@ -222,6 +222,7 @@ export default function Login() {
                 className="h-4 w-4 text-blue-600 border-gray-300 rounded"
               />
               <label htmlFor="remember" className="text-sm">Remember me</label>
+              
             </div>
           </div>
 
@@ -241,6 +242,15 @@ export default function Login() {
             >
               Register
             </span>
+                 <p className="text-center mt-1 text-sm">
+            Forgot your password?{" "}
+            <span
+              className="text-blue-600 hover:underline cursor-pointer"
+              onClick={() => navigate("/forgot-password")}
+            >
+              Click Here
+            </span>
+          </p>
           </p>
         </div>
       </div>

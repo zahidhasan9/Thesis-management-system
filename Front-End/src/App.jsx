@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 
 import Login from "./pages/auth/Login"
 import Register from "./pages/auth/Register"
+import ForgotPassword from "./pages/auth/ForgotPassword"
 import Home from "./pages/homepage/Home"
 
 import StudentDashboard from "./pages/student/StudentDashboard"
@@ -31,7 +32,7 @@ function App() {
 
         <Route path="/" element={<Home/>} />
         <Route path="/login" element={<Login/>} />
-
+        <Route path="/forgot-password" element={<ForgotPassword/>} />
         <Route path="/register" element={<Register/>} />
 
         {/* <Route path="/supervisor" element={<SupervisorDashboard/>} /> */}
