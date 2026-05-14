@@ -1209,6 +1209,7 @@ import PendingThesisTable from "../../components/admin/PendingThesisTable";
 import UsersSection from "../../components/admin/UsersSection";
 import ThesisSection from "../../components/admin/ThesisSection";
 import EditRoleModal from "../../components/admin/EditRoleModal";
+import SubmissionDeadlineCard from "../../components/admin/SubmissionDeadlineCard";
 
 import { exportUsersCSV } from "../../utils/admin/exportUsersCSV";
 import { exportUsersPDF } from "../../utils/admin/exportUsersPDF";
@@ -1330,12 +1331,42 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleAccountStatus = async (id, status) => {
+  const actionText =
+    status === "active"
+      ? "activate"
+      : status === "disabled"
+      ? "disable"
+      : "move to pending";
+
+  if (!window.confirm(`Are you sure you want to ${actionText} this account?`)) {
+    return;
+  }
+
+  try {
+    const res = await axios.patch(`/admin/users/${id}/status`, {
+      status,
+    });
+
+    toast.success(res.data.message || "Account status updated");
+
+    setUsers((prev) =>
+      prev.map((u) => (u._id === id ? res.data.user : u))
+    );
+  } catch (err) {
+    console.error(err);
+    toast.error(err.response?.data?.message || "Failed to update account");
+  }
+};
+
   const filteredUsers = useMemo(() => {
     return users.filter((u) => {
       const matchSearch =
         u.name?.toLowerCase().includes(search.toLowerCase()) ||
         u.email?.toLowerCase().includes(search.toLowerCase()) ||
-        u.role?.toLowerCase().includes(search.toLowerCase());
+        u.idNo?.toLowerCase().includes(searchText) ||
+        u.role?.toLowerCase().includes(search.toLowerCase())||
+        u.status?.toLowerCase().includes(searchText);
 
       const matchRole =
         userRoleFilter === "all" ? true : u.role === userRoleFilter;
@@ -1397,6 +1428,7 @@ export default function AdminDashboard() {
               declinedCount={declinedCount}
             />
             <AdminRoleSummary roleSummary={roleSummary} />
+            <SubmissionDeadlineCard />
             <DashboardCharts chartData={chartData} pieData={pieData} />
             <PendingThesisTable pending={pending} />
           </div>
@@ -1411,6 +1443,7 @@ export default function AdminDashboard() {
             filteredUsers={filteredUsers}
             openEditModal={openEditModal}
             handleDelete={handleDelete}
+             handleAccountStatus={handleAccountStatus}
             onExportCSV={() => exportUsersCSV(filteredUsers)}
             onExportPDF={() => exportUsersPDF(filteredUsers)}
           />

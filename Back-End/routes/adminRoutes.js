@@ -21,5 +21,25 @@ router.get("/thesis", protect, allowRoles("admin"), admin.getAllThesis);
 router.get("/thesis/:id",protect,allowRoles("admin"), admin.getSingleThesis);
 router.delete("/thesis/:id", protect, allowRoles("admin"), admin.deleteThesis);
 
+router.patch(
+  "/users/:id/status",
+  protect,
+  allowRoles("admin"),
+  admin.updateAccountStatus
+);
+router.get(
+  "/submission-setting",
+  protect,
+  allowRoles("admin"),
+  admin.getSubmissionSetting
+);
+
+router.patch(
+  "/submission-setting",
+  protect,
+  allowRoles("admin"),
+  admin.setSubmissionDeadline
+);
+
 
 module.exports = router

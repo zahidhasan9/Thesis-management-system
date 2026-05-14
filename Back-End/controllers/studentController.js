@@ -1,5 +1,6 @@
 const Thesis = require("../models/Thesis")
 const User = require("../models/User")
+const SubmissionSetting = require("../models/SubmissionSetting");
 
 exports.uploadThesis = async(req,res)=>{
 
@@ -143,4 +144,87 @@ exports.updateProfile = async (req, res) => {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
+};
+
+exports.recentThesisLibrary = async (req, res) => {
+  try {
+    const fourMonthsAgo = new Date();
+    fourMonthsAgo.setMonth(fourMonthsAgo.getMonth() - 4);
+
+    const thesis = await Thesis.find({
+      createdAt: { $gte: fourMonthsAgo },
+      status: { $in: ["accepted", "completed"] },
+    })
+      .populate("student", "name department batch Section")
+      .populate("supervisor", "name department")
+      .select("title description pdf status createdAt student supervisor")
+      .sort({ createdAt: -1 });
+
+    res.json(thesis);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
+
+
+exports.getStudentSubmissionStatus = async (req, res) => {
+  try {
+    const status = await getSubmissionStatus();
+    res.json(status);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.checkSubmissionDeadline = async (req, res, next) => {
+  try {
+    const status = await getSubmissionStatus();
+
+    if (!status.isOpen) {
+      return res.status(403).json({
+        message: "Thesis submission deadline is over. You cannot upload now.",
+        deadline: status.deadline,
+      });
+    }
+
+    next();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
+
+// ----------Helper Function--------------
+const getSubmissionStatus = async () => {
+  const setting = await SubmissionSetting.findOne({
+    key: "thesis_submission",
+  });
+
+  if (!setting) {
+    return {
+      isOpen: true,
+      deadline: null,
+      message: "No deadline has been set yet",
+    };
+  }
+
+  const now = new Date();
+  const isOpen = setting.isActive && now <= setting.deadline;
+
+  return {
+    isOpen,
+    deadline: setting.deadline,
+    isActive: setting.isActive,
+    message: isOpen
+      ? "Thesis submission is open"
+      : "Thesis submission deadline is over",
+  };
 };

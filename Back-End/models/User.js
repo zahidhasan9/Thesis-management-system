@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 
+const FIFTEEN_DAYS = 15 * 24 * 60 * 60 * 1000;
 const userSchema = new mongoose.Schema({
 
  name:String,
@@ -20,11 +21,37 @@ const userSchema = new mongoose.Schema({
 
  role:{
   type:String,
-  enum:["student","supervisor","evaluator","admin,third_evaluator"],
+  enum:["student","supervisor","evaluator","admin","third_evaluator"],
   default:"student"
  },
 
- session:String
+ session:String,
+
+ status: {
+  type: String,
+  enum: ["pending", "active", "disabled"],
+  default: "pending",
+},
+
+isActive: {
+  type: Boolean,
+  default: false,
+},
+
+activatedAt: {
+  type: Date,
+},
+
+disabledAt: {
+  type: Date,
+},
+
+deleteAfter: {
+      type: Date,
+      default: function () {
+        return new Date(Date.now() + FIFTEEN_DAYS);
+                          }
+},
 
 },{timestamps:true})
 

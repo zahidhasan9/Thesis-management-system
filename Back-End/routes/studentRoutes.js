@@ -6,12 +6,14 @@ const {protect} = require("../middleware/authMiddleware")
 const {allowRoles} = require("../middleware/roleMiddleware")
 const upload = require("../middleware/uploadMiddleware")
 
-router.post("/upload",
- protect,
- allowRoles("student"),
- upload.single("pdf"),
- student.uploadThesis
-)
+router.post(
+  "/upload",
+  protect,
+  allowRoles("student"),
+  student.checkSubmissionDeadline,
+  upload.single("pdf"),
+  student.uploadThesis
+);
 
 
 // router.post('/upload',
@@ -51,6 +53,20 @@ router.delete("/thesis/:id",
  allowRoles("student"),
  student.deleteThesis
 )
+
+router.get(
+  "/recent-thesis",
+  protect,
+  allowRoles("student"),
+  student.recentThesisLibrary
+);
+
+router.get(
+  "/submission-status",
+  protect,
+  allowRoles("student"),
+  student.getStudentSubmissionStatus
+);
 
 // profile
 router.get("/profile", protect, allowRoles("student"), student.getProfile);
