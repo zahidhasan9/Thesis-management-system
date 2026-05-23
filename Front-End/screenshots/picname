@@ -1,0 +1,15 @@
+home.png
+login.png
+register.png
+student-dashboard.png
+upload-thesis.png
+supervisor-dashboard.png
+evaluator-dashboard.png
+admin-dashboard.png
+thesis-details.png
+
+তাহলে README-র এই অংশে automatically image show করবে:
+
+markdowm likha lagbe
+![Home Page](screenshots/home.png)
+![Student Dashboard](screenshots/student-dashboard.png)
