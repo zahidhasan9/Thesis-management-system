@@ -1,88 +1,112 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
+import axios from "../../api/axios";
+import AuthPageShell from "../../components/AuthPageShell";
+
 export default function ForgotPassword() {
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [sent, setSent] = useState(false);
 
-  const handleForgotPassword = async () => {
-    if (!email) {
-      toast.error("Please enter your email", { placement: "top-right" });
+  const handleForgotPassword = async (event) => {
+    event.preventDefault();
+
+    if (!email.trim()) {
+      toast.error("Please enter your email");
       return;
     }
 
     setLoading(true);
 
-    // Just for static UI demo
-    setTimeout(() => {
-      toast.success("Password reset link sent successfully", {
-        placement: "top-right",
+    try {
+      const response = await axios.post("/auth/forgot-password", {
+        email,
       });
+
+      setSent(true);
+      toast.success(response.data.message);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message ||
+          "Password reset email could not be sent",
+      );
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Left panel */}
-      <div className="md:w-1/2 bg-gradient-to-tr from-blue-500 to-indigo-600 text-white p-10 flex flex-col justify-center">
-        <h1 className="text-4xl font-bold mb-4">Forgot Your Password?</h1>
-        <p className="mb-6 text-lg">
-          No worries! Enter your email address and we will help you reset your
-          password quickly and securely.
-        </p>
-        <ul className="list-disc ml-5 space-y-2">
-          <li>Secure password reset process</li>
-          <li>Quick email verification</li>
-          <li>Easy access recovery</li>
-          <li>Stay connected with your learning journey</li>
-        </ul>
-      </div>
+    <AuthPageShell
+      title="Forgot Password?"
+      description="Enter your registered email address and we will send you a secure password reset link."
+      footer={
+        <Link
+          className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+          to="/login"
+        >
+          ← Back to login
+        </Link>
+      }
+    >
+      {sent ? (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-5 text-emerald-700">
+          Check your inbox and spam folder. If your email is registered, you
+          will receive a password reset link.
+        </div>
+      ) : (
+        <form className="space-y-4" onSubmit={handleForgotPassword}>
+          <label className="block">
+            <span className="mb-1 block text-sm font-medium text-slate-700">
+              Email Address
+            </span>
 
-      {/* Right panel */}
-      <div className="md:w-1/2 flex justify-center items-center p-6 bg-gray-50">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-center mb-6">
-            Forgot Password
-          </h2>
-
-          <div className="flex flex-col mb-4">
-            <label htmlFor="email" className="mb-2 font-medium">
-              Email
-            </label>
             <input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
+              autoComplete="email"
+              className="
+                h-11
+                w-full
+                rounded-lg
+                border
+                border-slate-300
+                px-3
+                text-sm
+                outline-none
+                transition
+                focus:border-blue-500
+                focus:ring-4
+                focus:ring-blue-100
+              "
               onChange={(e) => setEmail(e.target.value)}
-              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+              type="email"
+              value={email}
+              placeholder="Enter your email"
             />
-          </div>
+          </label>
 
           <button
-            onClick={handleForgotPassword}
+            className="
+              h-11
+              w-full
+              rounded-lg
+              bg-blue-600
+              text-sm
+              font-semibold
+              text-white
+              transition
+              hover:bg-blue-700
+              disabled:cursor-not-allowed
+              disabled:opacity-60
+            "
             disabled={loading}
-            className={`w-full p-2 rounded-lg text-white font-medium ${
-              loading ? "bg-blue-300" : "bg-blue-600 hover:bg-blue-700"
-            }`}
+            type="submit"
           >
             {loading ? "Sending..." : "Send Reset Link"}
           </button>
-
-          <p className="text-center mt-4 text-sm">
-            Remember your password?{" "}
-            <span
-              className="text-blue-600 hover:underline cursor-pointer"
-              onClick={() => navigate("/login")}
-            >
-              Back to Login
-            </span>
-          </p>
-        </div>
-      </div>
-    </div>
+        </form>
+      )}
+    </AuthPageShell>
   );
 }

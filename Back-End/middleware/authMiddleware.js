@@ -1,29 +1,40 @@
-// const jwt = require("jsonwebtoken")
-// const User = require("../models/User")
+// const jwt = require("jsonwebtoken");
+// const User = require("../models/User");
 
-// exports.protect = async (req,res,next)=>{
+// exports.protect = async (req, res, next) => {
+//   try {
+//     const token = req.cookies.token;
 
-//  try{
+//     if (!token) {
+//       return res.status(401).json({
+//         message: "Not authorized",
+//       });
+//     }
 
-//   const token = req.cookies.token
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-//   if(!token){
-//    return res.status(401).json({message:"Not authorized"})
+//     const user = await User.findById(decoded.id).select("-password");
+
+//     if (!user) {
+//       return res.status(401).json({
+//         message: "User not found",
+//       });
+//     }
+
+//     if (user.status !== "active" || user.isActive !== true) {
+//       return res.status(403).json({
+//         message: "Account is not active",
+//       });
+//     }
+
+//     req.user = user;
+//     next();
+//   } catch (err) {
+//     res.status(401).json({
+//       message: "Token invalid",
+//     });
 //   }
-
-//   const decoded = jwt.verify(token,process.env.JWT_SECRET)
-
-//   req.user = await User.findById(decoded.id)
-
-
-//   next()
-
-//  }catch(err){
-//   res.status(401).json({message:"Token invalid"})
-//  }
-
-// }
-
+// };
 
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
@@ -39,12 +50,18 @@ exports.protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    const user = await User.findById(decoded.id).select("-password");
+    const user = await User.findById(decoded.id).select("+passwordChangedAt");
 
     if (!user) {
       return res.status(401).json({
         message: "User not found",
+      });
+    }
+
+    if (user.isEmailVerified === false) {
+      return res.status(403).json({
+        message: "Email is not verified",
+        code: "EMAIL_NOT_VERIFIED",
       });
     }
 
@@ -54,10 +71,20 @@ exports.protect = async (req, res, next) => {
       });
     }
 
+    if (
+      user.passwordChangedAt &&
+      Math.floor(user.passwordChangedAt.getTime() / 1000) > decoded.iat
+    ) {
+      return res.status(401).json({
+        message: "Password was changed. Please log in again.",
+      });
+    }
+
+    user.passwordChangedAt = undefined;
     req.user = user;
-    next();
-  } catch (err) {
-    res.status(401).json({
+    return next();
+  } catch (error) {
+    return res.status(401).json({
       message: "Token invalid",
     });
   }

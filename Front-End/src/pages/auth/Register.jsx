@@ -1,142 +1,269 @@
-
 import { useState } from "react";
-import axios from "../../api/axios";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { useNavigate } from "react-router-dom";
+
+import axios from "../../api/axios";
+import AuthPageShell from "../../components/AuthPageShell";
+
+const initialForm = {
+  name: "",
+  idNo: "",
+  email: "",
+  phone: "",
+  password: "",
+};
 
 export default function Register() {
   const navigate = useNavigate();
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [idNo, setIdNo] = useState("");
-  const [phone, setPhone] = useState("");
+  const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
 
-  const register = async () => {
-    if (!name || !email || !password || !idNo || !phone) {
-      toast.error("Please fill all fields");
+  const updateField = (event) => {
+    const { name, value } = event.target;
+    setForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  const register = async (event) => {
+    event.preventDefault();
+
+    if (Object.values(form).some((value) => !value.trim())) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    if (form.password.length < 8) {
+      toast.error("Password must contain at least 8 characters");
       return;
     }
 
     setLoading(true);
+
     try {
-      await axios.post("/auth/register", { name, email, password, idNo, phone });
-      toast.success("Registered successfully");
-      navigate("/"); // register successful -> go to login page
-    } catch (err) {
-      toast.error(err.response?.data?.message || "Registration failed");
+      const response = await axios.post("/auth/register", form);
+
+      toast.success(response.data.message);
+
+      navigate(
+        `/verify-email-sent?email=${encodeURIComponent(
+          form.email.trim().toLowerCase(),
+        )}`,
+        { replace: true },
+      );
+    } catch (error) {
+      const data = error.response?.data;
+
+      toast.error(data?.message || "Registration failed");
+
+      if (data?.code === "EMAIL_NOT_VERIFIED") {
+        navigate(
+          `/verify-email-sent?email=${encodeURIComponent(
+            form.email.trim().toLowerCase(),
+          )}`,
+        );
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row">
-      {/* Left panel: educational content */}
-      <div className="md:w-1/2 bg-gradient-to-tr from-green-500 to-teal-600 text-white p-10 flex flex-col justify-center">
-        <h1 className="text-4xl font-bold mb-4">Join EduPortal</h1>
-        <p className="mb-6 text-lg">
-          Create your account and start learning today! Access interactive lessons, track your progress, and join a community of learners.
-        </p>
-        <ul className="list-disc ml-5 space-y-2">
-          <li>Interactive tutorials and lessons</li>
-          <li>Real-time progress tracking</li>
-          <li>Expert guidance from educators</li>
-          <li>Connect with other learners</li>
-        </ul>
-      </div>
-
-      {/* Right panel: register form */}
-      <div className="md:w-1/2 flex justify-center items-center p-6 bg-gray-50">
-        <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-center mb-6">Register</h2>
-
-          <div className="flex flex-col mb-4">
-            <label htmlFor="name" className="mb-2 font-medium">Name</label>
-            <input
-              id="name"
-              type="text"
-              placeholder="Enter your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-
-           <div className="flex flex-col mb-4">
-            <label htmlFor="idNo" className="mb-2 font-medium">
-              ID Number <span className="text-sm text-gray-500">(Optional)</span>
-            </label>
-
-            <input
-              id="idNo"
-              type="text"
-              placeholder="Enter your ID (optional)"
-              value={idNo}
-              onChange={(e) => setIdNo(e.target.value)}
-              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-           </div>
-
-          <div className="flex flex-col mb-4">
-            <label htmlFor="email" className="mb-2 font-medium">Email</label>
-            <input
-              id="email"
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-
-         
-
-          <div className="flex flex-col mb-4">
-            <label htmlFor="phone" className="mb-2 font-medium">phone</label>
-            <input
-              id="phone"
-              type="number"
-              placeholder="Enter your phone"
-              value={phone}
-              onChange={(e) => setPhone(e.target.value)}
-              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-
-          <div className="flex flex-col mb-4">
-            <label htmlFor="password" className="mb-2 font-medium">Password</label>
-            <input
-              id="password"
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-            />
-          </div>
-
-          <button
-            onClick={register}
-            disabled={loading}
-            className={`w-full p-2 rounded-lg text-white font-medium ${loading ? 'bg-green-300' : 'bg-green-600 hover:bg-green-700'}`}
-          >
-            {loading ? "Registering..." : "Register"}
-          </button>
-
-          {/* Login link */}
-          <p className="text-center mt-4 text-sm">
+    <AuthPageShell
+      title="Create Account"
+      description="Register as a student and verify your email before account activation."
+      footer={
+        <>
+          <span className="text-sm text-slate-600">
             Already have an account?{" "}
-            <span
-              className="text-green-600 hover:underline cursor-pointer"
-              onClick={() => navigate("/login")}
-            >
-              Login
-            </span>
-          </p>
-        </div>
-      </div>
-    </div>
+          </span>
+
+          <Link
+            className="text-sm font-semibold text-blue-600 hover:text-blue-700"
+            to="/login"
+          >
+            Login
+          </Link>
+        </>
+      }
+    >
+      <form className="space-y-3" onSubmit={register}>
+        <label className="block">
+          <span className="mb-1 block text-sm font-medium text-slate-700">
+            Full Name
+          </span>
+
+          <input
+            autoComplete="name"
+            className="
+          h-10
+          w-full
+          rounded-lg
+          border
+          border-slate-300
+          px-3
+          text-sm
+          outline-none
+          transition
+          focus:border-blue-500
+          focus:ring-4
+          focus:ring-blue-100
+          "
+            name="name"
+            onChange={updateField}
+            required
+            type="text"
+            value={form.name}
+            placeholder="Enter full name"
+          />
+        </label>
+
+        <label className="block">
+          <span className="mb-1 block text-sm font-medium text-slate-700">
+            ID Number
+          </span>
+
+          <input
+            className="
+          h-10
+          w-full
+          rounded-lg
+          border
+          border-slate-300
+          px-3
+          text-sm
+          outline-none
+          transition
+          focus:border-blue-500
+          focus:ring-4
+          focus:ring-blue-100
+          "
+            name="idNo"
+            onChange={updateField}
+            required
+            type="text"
+            value={form.idNo}
+            placeholder="Enter ID number"
+          />
+        </label>
+
+        <label className="block">
+          <span className="mb-1 block text-sm font-medium text-slate-700">
+            Email Address
+          </span>
+
+          <input
+            autoComplete="email"
+            className="
+          h-10
+          w-full
+          rounded-lg
+          border
+          border-slate-300
+          px-3
+          text-sm
+          outline-none
+          transition
+          focus:border-blue-500
+          focus:ring-4
+          focus:ring-blue-100
+          "
+            name="email"
+            onChange={updateField}
+            required
+            type="email"
+            value={form.email}
+            placeholder="Enter email"
+          />
+        </label>
+
+        <label className="block">
+          <span className="mb-1 block text-sm font-medium text-slate-700">
+            Phone Number
+          </span>
+
+          <input
+            autoComplete="tel"
+            className="
+          h-10
+          w-full
+          rounded-lg
+          border
+          border-slate-300
+          px-3
+          text-sm
+          outline-none
+          transition
+          focus:border-blue-500
+          focus:ring-4
+          focus:ring-blue-100
+          "
+            name="phone"
+            onChange={updateField}
+            required
+            type="tel"
+            value={form.phone}
+            placeholder="Enter phone number"
+          />
+        </label>
+
+        <label className="block">
+          <span className="mb-1 block text-sm font-medium text-slate-700">
+            Password
+          </span>
+
+          <input
+            autoComplete="new-password"
+            className="
+          h-10
+          w-full
+          rounded-lg
+          border
+          border-slate-300
+          px-3
+          text-sm
+          outline-none
+          transition
+          focus:border-blue-500
+          focus:ring-4
+          focus:ring-blue-100
+          "
+            minLength={8}
+            name="password"
+            onChange={updateField}
+            required
+            type="password"
+            value={form.password}
+            placeholder="Create password"
+          />
+
+          <span className="mt-1 block text-xs text-slate-500">
+            Minimum 8 characters required.
+          </span>
+        </label>
+
+        <button
+          className="
+        mt-1
+        h-10
+        w-full
+        rounded-lg
+        bg-blue-600
+        text-sm
+        font-semibold
+        text-white
+        transition
+        hover:bg-blue-700
+        disabled:cursor-not-allowed
+        disabled:opacity-60
+        "
+          disabled={loading}
+          type="submit"
+        >
+          {loading ? "Creating Account..." : "Register"}
+        </button>
+      </form>
+    </AuthPageShell>
   );
 }
