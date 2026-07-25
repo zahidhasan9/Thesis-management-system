@@ -11,7 +11,7 @@ export default function ThesisSection({
   onExportPDF,
 }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+    <div className="min-w-0 rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
       <div className="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 mb-5">
         <div>
           <h2 className="text-lg font-semibold text-gray-800">
@@ -22,11 +22,11 @@ export default function ThesisSection({
           </p>
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-3 w-full xl:w-auto">
+        <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:gap-3">
           <select
             value={thesisStatusFilter}
             onChange={(e) => setThesisStatusFilter(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm bg-white"
+            className="col-span-2 rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm sm:col-span-1"
           >
             <option value="all">All Status</option>
             <option value="pending">Pending</option>
@@ -37,7 +37,7 @@ export default function ThesisSection({
 
           <button
             onClick={onExportCSV}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-300 bg-white rounded-lg text-sm hover:bg-gray-50"
+            className="inline-flex items-center justify-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2.5 text-sm hover:bg-gray-50"
           >
             <FileSpreadsheet className="w-4 h-4" />
             CSV
@@ -45,7 +45,7 @@ export default function ThesisSection({
 
           <button
             onClick={onExportPDF}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg text-sm hover:bg-black"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-gray-900 px-3 py-2.5 text-sm text-white hover:bg-black"
           >
             <FileDown className="w-4 h-4" />
             PDF

@@ -1,11 +1,10 @@
-import React from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import axios from "../api/axios"; 
+import NotificationCenter from "./NotificationCenter";
+import LogoutAllButton from "./LogoutAllButton";
 
 
 export default function Navbar({ items, portal }) {
-  const navigate = useNavigate();
-
 const handleLogout = async () => {
   try {
     await axios.post("/auth/logout"); // call backend logout
@@ -48,6 +47,12 @@ const handleLogout = async () => {
           </li>
         ))}
 
+        <li>
+          <NotificationCenter />
+        </li>
+        <li>
+          <LogoutAllButton />
+        </li>
         {/* Logout Button */}
         <li>
           <button

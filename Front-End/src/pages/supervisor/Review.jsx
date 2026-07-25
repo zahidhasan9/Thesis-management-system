@@ -474,7 +474,7 @@ export default function ReviewPage() {
       setThesis(res.data);
 
       if (res.data.supervisorNote) setNote(res.data.supervisorNote);
-      if (res.data.status) setStatus(res.data.status);
+      if (["accepted", "rejected"].includes(res.data.supervisorRequest?.status)) setStatus(res.data.supervisorRequest.status);
     } catch {
       toast.error("Failed to load thesis");
     } finally {
@@ -758,8 +758,7 @@ export default function ReviewPage() {
                 >
                   <option value="">Choose status</option>
                   <option value="accepted">Approve</option>
-                  <option value="declined">Reject</option>
-                  <option value="pending">Pending</option>
+                  <option value="rejected">Reject</option>
                 </select>
               </div>
 

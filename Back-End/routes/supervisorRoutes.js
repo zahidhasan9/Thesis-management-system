@@ -7,25 +7,25 @@ const {allowRoles} = require("../middleware/roleMiddleware")
 
 router.get("/thesis",
  protect,
- allowRoles("supervisor"),
+ allowRoles("supervisor", "evaluator", "third_evaluator"),
  supervisor.getAllThesis
 )
 
 router.patch("/review",
  protect,
- allowRoles("supervisor"),
+ allowRoles("supervisor", "evaluator", "third_evaluator"),
  supervisor.reviewThesis
 )
 
 router.get("/thesis/:id", protect,
-    allowRoles("supervisor"), 
+    allowRoles("supervisor", "evaluator", "third_evaluator"), 
     supervisor.getSingleThesis);
 
 // Get supervisor profile
-router.get("/profile", protect, allowRoles("supervisor"),  supervisor.getProfile);
+router.get("/profile", protect, allowRoles("supervisor", "evaluator", "third_evaluator"),  supervisor.getProfile);
 
 // Update supervisor profile
-router.patch("/profile", protect, allowRoles("supervisor"), supervisor.updateProfile);
+router.patch("/profile", protect, allowRoles("supervisor", "evaluator", "third_evaluator"), supervisor.updateProfile);
 
 
 

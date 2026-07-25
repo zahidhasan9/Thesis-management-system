@@ -1,4 +1,6 @@
 import { ChevronDown } from "lucide-react";
+import NotificationCenter from "../NotificationCenter";
+import LogoutAllButton from "../LogoutAllButton";
 
 export default function AdminHeader({
   activeTab,
@@ -22,6 +24,8 @@ export default function AdminHeader({
       </div>
 
       <div className="flex items-center gap-3">
+        <NotificationCenter />
+        <LogoutAllButton />
         <button
           onClick={fetchData}
           className="px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"

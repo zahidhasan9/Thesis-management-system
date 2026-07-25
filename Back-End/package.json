@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon server.js"
+    "test": "node --test tests",
+    "dev": "nodemon server.js",
+    "migrate:evaluation": "node scripts/migrateEvaluationWorkflow.js",
+    "backup": "powershell -ExecutionPolicy Bypass -File scripts/backupMongo.ps1"
   },
   "keywords": [],
   "author": "",

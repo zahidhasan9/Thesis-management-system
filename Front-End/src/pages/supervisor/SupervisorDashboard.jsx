@@ -176,18 +176,10 @@ export default function SupervisorDashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchThesis();
+    axios.get("/supervisor/thesis")
+      .then((res) => setThesis(res.data))
+      .catch(() => toast.error("Failed to load thesis"));
   }, []);
-
-  const fetchThesis = async () => {
-    try {
-      const res = await axios.get("/supervisor/thesis");
-      setThesis(res.data);
-    } catch (err) {
-      toast.error("Failed to load thesis");
-    }
-  };
-console.log("thesis", thesis);
   // Stats
   const total = thesis.length;
   const pending = thesis.filter(t => t.status === "pending").length;
@@ -210,6 +202,7 @@ console.log("thesis", thesis);
   ];
 
  const navItems = [
+    { name: "Evaluator Assignments", route: "/evaluator" },
     // { name: "Dashboard", route: "/dashboard" },
     // { name: "Upload Thesis", route: "/upload" },
     { name: "Profile", route: "/supervisor/profile" },

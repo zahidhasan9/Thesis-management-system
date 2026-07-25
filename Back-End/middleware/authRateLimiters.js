@@ -33,9 +33,16 @@ const resetPasswordLimiter = createLimiter({
   message: "Too many password reset attempts. Please try again later.",
 });
 
+const publicResultLimiter = createLimiter({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  message: "Too many result lookup attempts. Please try again after 15 minutes.",
+});
+
 module.exports = {
   loginLimiter,
   registrationLimiter,
   emailActionLimiter,
   resetPasswordLimiter,
+  publicResultLimiter,
 };

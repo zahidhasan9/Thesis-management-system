@@ -143,7 +143,10 @@ import {
   XCircle,
   Clock3,
   ShieldCheck,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
+import { useMemo, useState } from "react";
 
 export default function UsersSection({
   search,
@@ -157,6 +160,23 @@ export default function UsersSection({
   onExportCSV,
   onExportPDF,
 }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const totalUsers = filteredUsers?.length || 0;
+  const totalPages = Math.max(1, Math.ceil(totalUsers / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedUsers = useMemo(() => {
+    const start = (safePage - 1) * pageSize;
+    return (filteredUsers || []).slice(start, start + pageSize);
+  }, [filteredUsers, pageSize, safePage]);
+  const pageNumbers = useMemo(() => {
+    const start = Math.max(1, Math.min(safePage - 2, totalPages - 4));
+    return Array.from(
+      { length: Math.min(5, totalPages) },
+      (_, index) => start + index,
+    );
+  }, [safePage, totalPages]);
+
   const getStatusBadge = (status) => {
     if (status === "active") {
       return (
@@ -233,14 +253,20 @@ export default function UsersSection({
             type="text"
             placeholder="Search by name, email, ID, role or status..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setCurrentPage(1);
+            }}
             className="w-full border border-gray-300 rounded-lg pl-10 pr-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
           />
         </div>
 
         <select
           value={userRoleFilter}
-          onChange={(e) => setUserRoleFilter(e.target.value)}
+          onChange={(e) => {
+            setUserRoleFilter(e.target.value);
+            setCurrentPage(1);
+          }}
           className="border border-gray-300 rounded-lg px-3 py-2.5 text-sm bg-white"
         >
           <option value="all">All Roles</option>
@@ -268,7 +294,7 @@ export default function UsersSection({
             </thead>
 
             <tbody>
-              {filteredUsers.map((u) => (
+              {paginatedUsers.map((u) => (
                 <tr key={u._id} className="border-b hover:bg-gray-50">
                   <td className="px-4 py-3 font-medium text-gray-800">
                     {u.name || "-"}
@@ -333,6 +359,67 @@ export default function UsersSection({
               ))}
             </tbody>
           </table>
+          <div className="flex flex-col gap-4 border-t border-gray-200 px-1 pt-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
+              <span>
+                Showing{" "}
+                <strong>
+                  {(safePage - 1) * pageSize + 1}-
+                  {Math.min(safePage * pageSize, totalUsers)}
+                </strong>{" "}
+                of <strong>{totalUsers}</strong>
+              </span>
+              <label className="flex items-center gap-2">
+                Rows
+                <select
+                  value={pageSize}
+                  onChange={(event) => {
+                    setPageSize(Number(event.target.value));
+                    setCurrentPage(1);
+                  }}
+                  className="rounded-md border border-gray-300 bg-white px-2 py-1.5"
+                >
+                  <option value="10">10</option>
+                  <option value="20">20</option>
+                  <option value="50">50</option>
+                </select>
+              </label>
+            </div>
+
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => setCurrentPage(Math.max(1, safePage - 1))}
+                disabled={safePage === 1}
+                className="grid h-9 w-9 place-items-center rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+                title="Previous page"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              {pageNumbers.map((page) => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={`h-9 min-w-9 rounded-md border px-2 text-sm font-medium ${
+                    safePage === page
+                      ? "border-gray-900 bg-gray-900 text-white"
+                      : "border-gray-300 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() =>
+                  setCurrentPage(Math.min(totalPages, safePage + 1))
+                }
+                disabled={safePage === totalPages}
+                className="grid h-9 w-9 place-items-center rounded-md border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-40"
+                title="Next page"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="border border-dashed border-gray-300 rounded-xl p-8 text-center text-gray-500">

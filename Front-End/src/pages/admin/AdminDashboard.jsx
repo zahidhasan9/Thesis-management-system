@@ -1225,7 +1225,6 @@ export default function AdminDashboard() {
   const [thesis, setThesis] = useState([]);
   const [pending, setPending] = useState([]);
   const [chartData, setChartData] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const [search, setSearch] = useState("");
@@ -1242,7 +1241,6 @@ export default function AdminDashboard() {
 
   const fetchData = async () => {
     try {
-      setLoading(true);
       const [usersRes, statsRes, thesisRes, pendingRes, chartRes] =
         await Promise.all([
           axios.get("/admin/users"),
@@ -1257,15 +1255,14 @@ export default function AdminDashboard() {
       setThesis(thesisRes.data || []);
       setPending(pendingRes.data || []);
       setChartData(chartRes.data || []);
-    } catch (err) {
+    } catch {
       toast.error("API error! Check backend");
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    const initialLoad = window.setTimeout(fetchData, 0);
+    return () => window.clearTimeout(initialLoad);
   }, []);
 
   const openEditModal = (user) => {
@@ -1364,9 +1361,9 @@ export default function AdminDashboard() {
       const matchSearch =
         u.name?.toLowerCase().includes(search.toLowerCase()) ||
         u.email?.toLowerCase().includes(search.toLowerCase()) ||
-        u.idNo?.toLowerCase().includes(searchText) ||
+        u.idNo?.toLowerCase().includes(search.toLowerCase()) ||
         u.role?.toLowerCase().includes(search.toLowerCase())||
-        u.status?.toLowerCase().includes(searchText);
+        u.status?.toLowerCase().includes(search.toLowerCase());
 
       const matchRole =
         userRoleFilter === "all" ? true : u.role === userRoleFilter;
@@ -1409,7 +1406,7 @@ export default function AdminDashboard() {
         handleLogout={handleLogout}
       />
 
-      <main className="flex-1 p-4 sm:p-6 lg:p-8">
+      <main className="min-w-0 flex-1 px-4 pb-6 pt-24 sm:px-6 lg:p-8">
         <AdminHeader
           activeTab={activeTab}
           fetchData={fetchData}

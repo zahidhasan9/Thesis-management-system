@@ -31,6 +31,12 @@ export default function Home() {
         <h1 className="text-2xl font-bold text-blue-600">Thesis Management Portal</h1>
         <div className="space-x-4">
           <button
+            onClick={() => navigate("/results")}
+            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200"
+          >
+            Verify Result
+          </button>
+          <button
             onClick={() => navigate("/login")}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
           >

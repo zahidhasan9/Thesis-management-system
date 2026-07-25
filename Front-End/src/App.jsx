@@ -144,12 +144,14 @@ import EvaluatorProfile from "./pages/evaluator/Profile";
 
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminThesisDetails from "./pages/admin/AdminThesisDetails";
+import PublicResults from "./pages/public/PublicResults";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<Home />} path="/" />
+        <Route element={<PublicResults />} path="/results" />
 
         <Route element={<Login />} path="/login" />
         <Route element={<Register />} path="/register" />
@@ -160,7 +162,7 @@ function App() {
 
         <Route
           element={
-            <ProtectedRoute roles={["evaluator", "third_evaluator"]}>
+            <ProtectedRoute roles={["evaluator", "supervisor", "third_evaluator"]}>
               <EvaluatorDashboard />
             </ProtectedRoute>
           }
@@ -169,7 +171,7 @@ function App() {
 
         <Route
           element={
-            <ProtectedRoute roles={["evaluator", "third_evaluator"]}>
+            <ProtectedRoute roles={["evaluator", "supervisor", "third_evaluator"]}>
               <ThesisEvaluationDetails />
             </ProtectedRoute>
           }
@@ -241,7 +243,7 @@ function App() {
 
         <Route
           element={
-            <ProtectedRoute roles={["supervisor"]}>
+            <ProtectedRoute roles={["supervisor", "evaluator", "third_evaluator"]}>
               <SupervisorDashboard />
             </ProtectedRoute>
           }
@@ -250,7 +252,7 @@ function App() {
 
         <Route
           element={
-            <ProtectedRoute roles={["supervisor"]}>
+            <ProtectedRoute roles={["supervisor", "evaluator", "third_evaluator"]}>
               <SupervisorProfile />
             </ProtectedRoute>
           }
@@ -259,7 +261,7 @@ function App() {
 
         <Route
           element={
-            <ProtectedRoute roles={["supervisor"]}>
+            <ProtectedRoute roles={["supervisor", "evaluator", "third_evaluator"]}>
               <ReviewPage />
             </ProtectedRoute>
           }

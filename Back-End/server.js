@@ -28,8 +28,14 @@ const mongoose = require("mongoose");
 const app = require("./app");
 const cleanupInactiveUsers = require("./utils/cleanupInactiveUsers");
 const { verifyMailer } = require("./utils/mailer");
+const { sendEvaluationReminders } = require("./utils/evaluationReminders");
 
 const PORT = Number(process.env.PORT || 5000);
+const REMINDER_INTERVAL =
+  Math.max(Number(process.env.REMINDER_INTERVAL_HOURS || 6), 1) *
+  60 *
+  60 *
+  1000;
 
 mongoose
   .connect(process.env.MONGO_URI)
@@ -43,6 +49,15 @@ mongoose
         cleanupInactiveUsers();
       },
       24 * 60 * 60 * 1000,
+    );
+
+    setInterval(
+      () => {
+        sendEvaluationReminders().catch((error) =>
+          console.error("Evaluation reminder job failed:", error.message),
+        );
+      },
+      REMINDER_INTERVAL,
     );
 
     app.listen(PORT, () => {

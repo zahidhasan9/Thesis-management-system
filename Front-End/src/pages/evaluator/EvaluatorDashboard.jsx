@@ -153,6 +153,10 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+const isConflictCase = () => false;
+const isCompleted = (thesis) =>
+  thesis?.evaluatorAssignments?.[0]?.mark != null;
+
 export default function EvaluatorDashboard() {
   const [theses, setTheses] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -169,40 +173,16 @@ export default function EvaluatorDashboard() {
   const role = user?.role;
   const isThirdEvaluator = role === "third_evaluator";
 
-  const navItems = [{ name: "Profile", route: "/evaluator/profile" }];
-
-  const getMarkDifference = (thesis) => {
-    if (!thesis?.evaluatorMarks || thesis.evaluatorMarks.length !== 2) {
-      return 0;
-    }
-
-    const firstMark = Number(thesis.evaluatorMarks[0]?.mark || 0);
-    const secondMark = Number(thesis.evaluatorMarks[1]?.mark || 0);
-
-    return Math.abs(firstMark - secondMark);
-  };
-
-  const isConflictCase = (thesis) => {
-    return getMarkDifference(thesis) > 14;
-  };
-
-  const isCompleted = (thesis) => {
-    return (
-      thesis?.status === "completed" ||
-      thesis?.finalMark !== null ||
-      thesis?.thirdEvaluatorMark?.mark !== undefined
-    );
-  };
+  const navItems = [
+    { name: "Supervisor Assignments", route: "/supervisor" },
+    { name: "Profile", route: role === "supervisor" ? "/supervisor/profile" : "/evaluator/profile" },
+  ];
 
   const fetchTheses = useCallback(async () => {
     try {
       setLoading(true);
 
-      const endpoint = isThirdEvaluator
-        ? "/evaluator/pending-third"
-        : "/evaluator/accepted";
-
-      const res = await axios.get(endpoint);
+      const res = await axios.get("/evaluator/accepted");
       setTheses(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
@@ -212,7 +192,7 @@ export default function EvaluatorDashboard() {
     } finally {
       setLoading(false);
     }
-  }, [isThirdEvaluator]);
+  }, []);
 
   useEffect(() => {
     fetchTheses();

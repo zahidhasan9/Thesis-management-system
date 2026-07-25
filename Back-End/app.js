@@ -45,6 +45,8 @@ const adminRoutes = require("./routes/adminRoutes");
 const studentRoutes = require("./routes/studentRoutes");
 const supervisorRoutes = require("./routes/supervisorRoutes");
 const evaluatorRoutes = require("./routes/evaluatorRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
+const publicResultRoutes = require("./routes/publicResultRoutes");
 
 const app = express();
 
@@ -82,6 +84,8 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/student", studentRoutes);
 app.use("/api/supervisor", supervisorRoutes);
 app.use("/api/evaluator", evaluatorRoutes);
+app.use("/api/notifications", notificationRoutes);
+app.use("/api/public", publicResultRoutes);
 
 app.use((error, req, res, next) => {
   console.error(error);

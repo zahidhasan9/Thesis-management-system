@@ -50,7 +50,7 @@ export default function AdminSidebar({
       </div>
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-72 min-h-screen bg-white border-r border-gray-200 flex-col justify-between">
+      <aside className="sticky top-0 hidden h-screen w-72 shrink-0 flex-col justify-between border-r border-gray-200 bg-white lg:flex">
         <div className="p-6">
           <div className="mb-8">
             <div className="w-12 h-12 rounded-2xl bg-gray-900 text-white flex items-center justify-center mb-4">

@@ -12,6 +12,19 @@ const thesisSchema = new mongoose.Schema({
   type:mongoose.Schema.Types.ObjectId,
   ref:"User"
  },
+ supervisorRequest:{
+  status:{type:String,enum:["unassigned","pending","accepted","rejected","reassigned"],default:"unassigned"},
+  respondedAt:Date,
+  rejectionReason:{type:String,trim:true},
+  note:{type:String,trim:true},
+  deadline:Date,
+  reminderSentAt:Date,
+  emailDelivery:{
+   status:{type:String,enum:["not_sent","pending","sent","failed"],default:"not_sent"},
+   sentAt:Date,
+   error:String
+  }
+ },
 
  pdf:String,
 
@@ -26,6 +39,41 @@ const thesisSchema = new mongoose.Schema({
   evaluators:[{
   type:mongoose.Schema.Types.ObjectId,
   ref:"User"
+ }],
+
+ evaluatorAssignments:[{
+  evaluator:{type:mongoose.Schema.Types.ObjectId,ref:"User",required:true},
+  position:{type:Number,enum:[1,2,3],required:true},
+  status:{type:String,enum:["pending","accepted","rejected","reassigned","evaluation_pending","mark_submitted","completed"],default:"pending"},
+  respondedAt:Date,
+  rejectionReason:{type:String,trim:true},
+  note:{type:String,trim:true},
+  mark:{type:Number,min:0,max:100,default:null},
+  feedback:{type:String,trim:true},
+  recommendation:{type:String,trim:true},
+  rubric:{
+   researchQuality:{type:Number,min:0,max:20},
+   methodology:{type:Number,min:0,max:20},
+   implementation:{type:Number,min:0,max:20},
+   reportQuality:{type:Number,min:0,max:20},
+   presentation:{type:Number,min:0,max:20}
+  },
+  submittedAt:Date,
+  deadline:Date,
+  reminderSentAt:Date,
+  markLocked:{type:Boolean,default:false},
+  markHistory:[{
+   previousMark:Number,
+   newMark:Number,
+   changedBy:{type:mongoose.Schema.Types.ObjectId,ref:"User"},
+   changedAt:{type:Date,default:Date.now},
+   reason:String
+  }],
+  emailDelivery:{
+   status:{type:String,enum:["not_sent","pending","sent","failed"],default:"not_sent"},
+   sentAt:Date,
+   error:String
+  }
  }],
 
  evaluatorMarks:[
@@ -47,7 +95,31 @@ const thesisSchema = new mongoose.Schema({
 
  // Final mark after calculation
 //  finalMark: { type: Number, default: null }
- finalMark:Number
+ finalMark:Number,
+ bestTwoMarks:[Number],
+ finalMarkCalculatedAt:Date,
+ finalMarkStatus:{
+  type:String,
+  enum:["pending","calculated","approved","published"],
+  default:"pending"
+ },
+ thirdEvaluatorRequired:{type:Boolean,default:false},
+ thirdEvaluatorRequirementType:{
+  type:String,
+  enum:["none","automatic","manual"],
+  default:"none"
+ },
+ thirdEvaluatorRequirementReason:String,
+ thirdEvaluatorRequiredBy:{type:mongoose.Schema.Types.ObjectId,ref:"User"},
+ thirdEvaluatorRequiredAt:Date,
+ evaluationThreshold:{type:Number,default:()=>Number(process.env.THIRD_EVALUATOR_THRESHOLD || 10)},
+ resultPublished:{type:Boolean,default:false},
+ resultPublishedAt:Date,
+ resultPublishedBy:{type:mongoose.Schema.Types.ObjectId,ref:"User"}
+ ,
+ studentFeedback:String,
+ studentFeedbackPublished:{type:Boolean,default:false},
+ studentFeedbackPublishedAt:Date
 
 },{timestamps:true})
 

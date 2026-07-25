@@ -1,6 +1,7 @@
 const Thesis = require("../models/Thesis")
 const User = require("../models/User")
 const SubmissionSetting = require("../models/SubmissionSetting");
+const { sanitizeForStudent } = require("../services/evaluationPrivacy");
 
 exports.uploadThesis = async(req,res)=>{
 
@@ -23,11 +24,11 @@ exports.myThesis = async(req,res)=>{
 
  const thesis = await Thesis.find({
   student:req.user._id
- }).populate("supervisor")
-   .populate({path:"thirdEvaluatorMark.evaluator"})
-   .populate({path: "evaluatorMarks.evaluator"})
+ }).populate("supervisor", "name email department phone")
+   .select("-evaluatorMarks -thirdEvaluatorMark -evaluatorAssignments")
+   .lean()
 
- res.json(thesis)
+ res.json(thesis.map(sanitizeForStudent))
 
 }
 
@@ -57,8 +58,7 @@ exports.getSingleThesis = async (req, res) => {
     })
       .populate("student", "name email idNo phone")
       .populate("supervisor", "name email department phone")
-      .populate("evaluatorMarks.evaluator", "name email role")
-      .populate("thirdEvaluatorMark.evaluator", "name email role");
+      .select("-evaluatorMarks -thirdEvaluatorMark -evaluatorAssignments.mark -evaluatorAssignments.feedback -evaluatorAssignments.evaluator");
 
     if (!thesis) {
       return res.status(404).json({
@@ -66,7 +66,7 @@ exports.getSingleThesis = async (req, res) => {
       });
     }
 
-    res.json(thesis);
+    res.json(sanitizeForStudent(thesis));
   } catch (err) {
     console.error(err);
     res.status(500).json({

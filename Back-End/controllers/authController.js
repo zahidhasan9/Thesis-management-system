@@ -27,8 +27,8 @@ const createSecureToken = () => {
   };
 };
 
-const createLoginToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, {
+const createLoginToken = (user) =>
+  jwt.sign({ id: user._id, tv: user.tokenVersion || 0 }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 
@@ -322,7 +322,7 @@ exports.login = async (req, res) => {
 
     const user = await User.findOne({
       email: normalizedEmail,
-    }).select("+password");
+    }).select("+password +tokenVersion");
 
     const passwordMatches = user
       ? await bcrypt.compare(password, user.password)
@@ -360,7 +360,12 @@ exports.login = async (req, res) => {
       });
     }
 
-    const token = createLoginToken(user._id);
+    user.lastLoginAt = new Date();
+    user.lastLoginIp = req.ip;
+    user.lastLoginUserAgent = String(req.get("user-agent") || "").slice(0, 500);
+    await user.save();
+
+    const token = createLoginToken(user);
     res.cookie("token", token, getCookieOptions());
 
     const safeUser = await User.findById(user._id);
@@ -498,4 +503,17 @@ exports.logout = async (req, res) => {
   return res.status(200).json({
     message: "Logged out successfully",
   });
+};
+
+exports.logoutAll = async (req, res) => {
+  try {
+    await User.findByIdAndUpdate(req.user._id, { $inc: { tokenVersion: 1 } });
+    res.clearCookie("token", {
+      ...getCookieOptions(),
+      maxAge: undefined,
+    });
+    return res.json({ message: "Logged out from all devices" });
+  } catch (error) {
+    return res.status(500).json({ message: "Could not end all sessions" });
+  }
 };

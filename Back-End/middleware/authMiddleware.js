@@ -50,7 +50,9 @@ exports.protect = async (req, res, next) => {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select("+passwordChangedAt");
+    const user = await User.findById(decoded.id).select(
+      "+passwordChangedAt +tokenVersion",
+    );
 
     if (!user) {
       return res.status(401).json({
@@ -80,7 +82,14 @@ exports.protect = async (req, res, next) => {
       });
     }
 
+    if ((decoded.tv ?? 0) !== (user.tokenVersion || 0)) {
+      return res.status(401).json({
+        message: "This session has ended. Please log in again.",
+      });
+    }
+
     user.passwordChangedAt = undefined;
+    user.tokenVersion = undefined;
     req.user = user;
     return next();
   } catch (error) {
