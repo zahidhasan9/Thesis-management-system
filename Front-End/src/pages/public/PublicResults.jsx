@@ -178,7 +178,7 @@ function ResultPanel({ response, loading }) {
             <tr>
               <th className="px-4 py-3">Thesis</th>
               <th className="px-4 py-3">Supervisor</th>
-              <th className="px-4 py-3">Final Mark</th>
+              <th className="px-4 py-3">Grade</th>
               <th className="px-4 py-3">Published</th>
             </tr>
           </thead>
@@ -195,7 +195,7 @@ function ResultPanel({ response, loading }) {
                   {result.supervisor?.name || "-"}
                 </td>
                 <td className="px-4 py-4 text-xl font-semibold text-gray-900">
-                  {result.finalMark}
+                  {result.grade}
                 </td>
                 <td className="px-4 py-4 text-gray-600">
                   {formatDate(result.publishedAt)}
@@ -222,7 +222,7 @@ function ResultPanel({ response, loading }) {
                 </p>
               </div>
               <span className="inline-flex items-center gap-1 text-xl font-semibold">
-                <Award size={18} /> {result.finalMark}
+                <Award size={18} /> {result.grade}
               </span>
             </div>
             <p className="mt-3 break-all text-xs text-gray-400">

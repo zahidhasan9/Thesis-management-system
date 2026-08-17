@@ -1,4 +1,4 @@
-const DEFAULT_THRESHOLD = Number(process.env.THIRD_EVALUATOR_THRESHOLD || 10);
+const DEFAULT_THRESHOLD = Number(process.env.THIRD_EVALUATOR_THRESHOLD || 14);
 
 const validSubmittedAssignments = (thesis) =>
   (thesis.evaluatorAssignments || []).filter(
@@ -14,9 +14,16 @@ const getEvaluationState = (thesis) => {
   const first = assignments.find((item) => item.position === 1);
   const second = assignments.find((item) => item.position === 2);
   const third = assignments.find((item) => item.position === 3);
-  const threshold = Number.isFinite(thesis.evaluationThreshold)
-    ? thesis.evaluationThreshold
-    : DEFAULT_THRESHOLD;
+  const configuredThreshold =
+    process.env.THIRD_EVALUATOR_THRESHOLD === undefined
+      ? null
+      : Number(process.env.THIRD_EVALUATOR_THRESHOLD);
+  const threshold =
+    Number.isFinite(configuredThreshold) && configuredThreshold >= 0
+      ? configuredThreshold
+      : Number.isFinite(thesis.evaluationThreshold)
+        ? thesis.evaluationThreshold
+        : DEFAULT_THRESHOLD;
   const firstTwoReady =
     Number.isFinite(first?.mark) &&
     Number.isFinite(second?.mark) &&
@@ -73,6 +80,7 @@ const calculateFinalMark = (thesis) => {
 
 const applyEvaluationCalculation = (thesis) => {
   const result = calculateFinalMark(thesis);
+  thesis.evaluationThreshold = result.threshold;
 
   if (
     result.automaticallyRequired &&

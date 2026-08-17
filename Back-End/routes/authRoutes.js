@@ -14,6 +14,8 @@ const router = require("express").Router();
 
 const auth = require("../controllers/authController");
 const { protect } = require("../middleware/authMiddleware");
+const profile = require("../controllers/profileController");
+const { uploadProfileImage } = require("../middleware/profileImageUpload");
 const {
   loginLimiter,
   registrationLimiter,
@@ -32,6 +34,8 @@ router.post(
 router.post("/login", loginLimiter, auth.login);
 router.post("/logout", auth.logout);
 router.post("/logout-all", protect, auth.logoutAll);
+router.patch("/profile-picture", protect, uploadProfileImage, profile.uploadProfileImage);
+router.delete("/profile-picture", protect, profile.removeProfileImage);
 
 router.post("/forgot-password", emailActionLimiter, auth.forgotPassword);
 router.post("/reset-password/:token", resetPasswordLimiter, auth.resetPassword);

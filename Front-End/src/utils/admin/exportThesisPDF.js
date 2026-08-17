@@ -9,8 +9,9 @@ export const exportThesisPDF = (thesisList = []) => {
 
   autoTable(doc, {
     startY: 22,
-    head: [["Title", "Student", "Status", "Final Mark", "Created At"]],
+    head: [["Project ID", "Title", "Student", "Status", "Final Mark", "Created At"]],
     body: thesisList.map((t) => [
+      t?.projectId || t?._id || "",
       t?.title || "",
       t?.student?.name || "",
       t?.status || "",

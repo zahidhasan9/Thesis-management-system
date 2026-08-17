@@ -2,21 +2,80 @@ const Thesis = require("../models/Thesis")
 const User = require("../models/User")
 const SubmissionSetting = require("../models/SubmissionSetting");
 const { sanitizeForStudent } = require("../services/evaluationPrivacy");
+const { assignProjectId } = require("../services/projectId");
+const fs = require("fs");
+
+const removeUploadedFile = (file) => {
+  if (file?.path) fs.promises.unlink(file.path).catch(() => undefined);
+};
 
 exports.uploadThesis = async(req,res)=>{
 
- const thesis = await Thesis.create({
+ const title = String(req.body.title || "").trim();
+ const description = String(req.body.description || "").trim();
+ const aiScoreInput = req.body.aiScore;
+ const plagiarismScoreInput = req.body.plagiarismScore;
+ const aiScore = Number(aiScoreInput);
+ const plagiarismScore = Number(plagiarismScoreInput);
+ const aiCheckUrl = String(req.body.aiCheckUrl || "").trim();
+ const plagiarismCheckUrl = String(req.body.plagiarismCheckUrl || "").trim();
+
+ if (!title || !req.file) {
+  removeUploadedFile(req.file);
+  return res.status(400).json({message:"Title and thesis PDF are required"});
+ }
+
+ const invalidScore = (score, input) =>
+  input === undefined || input === null || String(input).trim() === "" ||
+  !Number.isFinite(score) || score < 0 || score >= 25;
+
+ if (invalidScore(aiScore, aiScoreInput) || invalidScore(plagiarismScore, plagiarismScoreInput)) {
+  removeUploadedFile(req.file);
+  return res.status(400).json({
+   message:"AI and plagiarism scores must be between 0% and less than 25%"
+  });
+ }
+
+ const isValidReferenceUrl = (value) => {
+  try {
+   const url = new URL(value);
+   return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+   return false;
+  }
+ };
+
+ if (!isValidReferenceUrl(aiCheckUrl) || !isValidReferenceUrl(plagiarismCheckUrl)) {
+  removeUploadedFile(req.file);
+  return res.status(400).json({
+   message:"Valid AI and plagiarism reference links are required"
+  });
+ }
+
+ try {
+  const thesis = await Thesis.create({
 
   student:req.user._id,
 
-  title:req.body.title,
-  description:req.body.description,
+  title,
+  description,
+  aiScore,
+  plagiarismScore,
+  aiCheckUrl,
+  plagiarismCheckUrl,
 
   pdf:req.file.path
 
- })
+  })
 
- res.json(thesis)
+  await assignProjectId(thesis, req.user)
+
+  return res.status(201).json(thesis)
+ } catch (error) {
+  removeUploadedFile(req.file);
+  console.error("Thesis upload error:", error);
+  return res.status(500).json({message:"Thesis upload failed"});
+ }
 
 }
 
@@ -138,6 +197,7 @@ exports.updateProfile = async (req, res) => {
       batch: student.batch,
       Section: student.Section,
       department: student.department,
+      profileImage: student.profileImage,
 
     });
   } catch (err) {

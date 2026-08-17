@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import axios from "../../api/axios";
+import ProfilePhotoUploader from "../../components/ProfilePhotoUploader";
+import DepartmentSelect from "../../components/DepartmentSelect";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -176,9 +178,7 @@ export default function Profile() {
             {/* Profile summary */}
             <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
               <div className="flex flex-col sm:flex-row sm:items-center gap-5">
-                <div className="w-20 h-20 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center">
-                  <UserCircle2 className="w-10 h-10 text-gray-500" />
-                </div>
+                <ProfilePhotoUploader user={user} onUpdated={setUser} />
 
                 <div className="flex-1 min-w-0">
                   <h2 className="text-2xl font-semibold text-gray-900">
@@ -289,11 +289,9 @@ export default function Profile() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Department
                     </label>
-                    <input
-                      type="text"
+                    <DepartmentSelect
                       value={department}
                       onChange={(e) => setDepartment(e.target.value)}
-                      placeholder="Enter your department"
                       className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
                     />
                   </div>

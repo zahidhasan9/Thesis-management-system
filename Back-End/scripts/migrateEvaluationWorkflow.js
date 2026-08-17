@@ -47,10 +47,11 @@ const migrate = async () => {
       };
       changed = true;
     }
-    if (!Number.isFinite(thesis.evaluationThreshold)) {
-      thesis.evaluationThreshold = Number(
-        process.env.THIRD_EVALUATOR_THRESHOLD || 10,
-      );
+    const configuredThreshold = Number(
+      process.env.THIRD_EVALUATOR_THRESHOLD || 14,
+    );
+    if (thesis.evaluationThreshold !== configuredThreshold) {
+      thesis.evaluationThreshold = configuredThreshold;
       changed = true;
     }
     if (changed) {

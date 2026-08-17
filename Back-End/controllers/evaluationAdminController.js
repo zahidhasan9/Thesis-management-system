@@ -2,7 +2,11 @@ const mongoose = require("mongoose");
 const User = require("../models/User");
 const Thesis = require("../models/Thesis");
 const AuditLog = require("../models/AuditLog");
-const { applyEvaluationCalculation, getEvaluationState } = require("../services/evaluationService");
+const {
+  DEFAULT_THRESHOLD,
+  applyEvaluationCalculation,
+  getEvaluationState,
+} = require("../services/evaluationService");
 const { recordAudit } = require("../utils/audit");
 const {
   sendAssignmentEmail,
@@ -66,13 +70,13 @@ const updateEmailStatus = async (thesis, target, send) => {
 
 exports.getEligibleStaff = async (req, res) => {
   try {
-    const [users, workload] = await Promise.all([
+    const [users, evaluatorWorkload, supervisorWorkload] = await Promise.all([
       User.find({
         status: "active",
         isActive: true,
         role: { $in: STAFF_ROLES },
       })
-        .select("name email department position role")
+        .select("name email department university position role profileImage")
         .sort({ name: 1 })
         .lean(),
       Thesis.aggregate([
@@ -91,11 +95,26 @@ exports.getEligibleStaff = async (req, res) => {
           },
         },
       ]),
+      Thesis.aggregate([
+        {
+          $match: {
+            supervisor: { $ne: null },
+            "supervisorRequest.status": { $in: ["pending", "accepted"] },
+          },
+        },
+        { $group: { _id: "$supervisor", count: { $sum: 1 } } },
+      ]),
     ]);
-    const counts = new Map(workload.map((item) => [item._id.toString(), item.count]));
+    const counts = new Map();
+    [...evaluatorWorkload, ...supervisorWorkload].forEach((item) => {
+      const key = item._id.toString();
+      counts.set(key, (counts.get(key) || 0) + item.count);
+    });
     res.json(
       users.map((user) => ({
         ...user,
+        university:
+          user.university || process.env.DEFAULT_UNIVERSITY_NAME || "NSTU",
         currentWorkload: counts.get(user._id.toString()) || 0,
       })),
     );
@@ -109,6 +128,7 @@ exports.assignCoreTeam = async (req, res) => {
     const thesis = await requireThesis(req.params.id, res);
     if (!thesis) return;
     const { supervisorId, evaluatorIds } = req.body;
+    thesis.evaluationThreshold = DEFAULT_THRESHOLD;
     const deadline = req.body.deadline ? new Date(req.body.deadline) : null;
     if (deadline && Number.isNaN(deadline.getTime())) {
       return res.status(400).json({ message: "Invalid evaluation deadline" });
@@ -292,8 +312,11 @@ exports.assignThirdEvaluator = async (req, res) => {
     if (!thesis) return;
     const { evaluatorId } = req.body;
     const deadline = req.body.deadline ? new Date(req.body.deadline) : null;
-    if (deadline && Number.isNaN(deadline.getTime())) {
-      return res.status(400).json({ message: "Invalid evaluation deadline" });
+    if (!deadline || Number.isNaN(deadline.getTime())) {
+      return res.status(400).json({ message: "Third Evaluator deadline is required" });
+    }
+    if (deadline <= new Date()) {
+      return res.status(400).json({ message: "Third Evaluator deadline must be in the future" });
     }
     if (!thesis.thirdEvaluatorRequired) {
       return res.status(409).json({

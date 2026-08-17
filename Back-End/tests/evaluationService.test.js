@@ -66,6 +66,27 @@ test("difference equal to threshold does not require a third evaluator", () => {
   assert.equal(state.automaticallyRequired, false);
 });
 
+test("default threshold is 14 and only a greater difference requires third evaluation", () => {
+  const previous = process.env.THIRD_EVALUATOR_THRESHOLD;
+  delete process.env.THIRD_EVALUATOR_THRESHOLD;
+  const equalState = getEvaluationState({
+    evaluatorAssignments: [
+      assignment(1, "u1", 74),
+      assignment(2, "u2", 60),
+    ],
+  });
+  const greaterState = getEvaluationState({
+    evaluatorAssignments: [
+      assignment(1, "u1", 75),
+      assignment(2, "u2", 60),
+    ],
+  });
+  if (previous !== undefined) process.env.THIRD_EVALUATOR_THRESHOLD = previous;
+  assert.equal(equalState.threshold, 14);
+  assert.equal(equalState.automaticallyRequired, false);
+  assert.equal(greaterState.automaticallyRequired, true);
+});
+
 test("required third evaluation keeps final mark pending until submitted", () => {
   const result = calculateFinalMark({
     evaluatorAssignments: [
@@ -119,13 +140,14 @@ test("student cannot see evaluator data or an unpublished final mark", () => {
   assert.equal(response.evaluatorAssignments, undefined);
 });
 
-test("student can see a published final mark", () => {
+test("student sees only a grade for a published result", () => {
   const response = sanitizeForStudent({
     finalMark: 80,
     finalMarkStatus: "published",
     resultPublished: true,
   });
-  assert.equal(response.finalMark, 80);
+  assert.equal(response.finalMark, undefined);
+  assert.equal(response.grade, "A+");
 });
 
 test("student cannot see unpublished approved feedback", () => {
@@ -158,7 +180,8 @@ test("public result contains no evaluator or internal calculation data", () => {
     evaluatorAssignments: [assignment(1, "u1", 85)],
     bestTwoMarks: [85, 79],
   });
-  assert.equal(response.finalMark, 82);
+  assert.equal(response.finalMark, undefined);
+  assert.equal(response.grade, "A+");
   assert.equal(response.evaluatorAssignments, undefined);
   assert.equal(response.bestTwoMarks, undefined);
 });

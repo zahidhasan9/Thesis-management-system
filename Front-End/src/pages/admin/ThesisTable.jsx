@@ -6,10 +6,9 @@ import {
   FileText,
   Trash2,
 } from "lucide-react";
+import { fileUrl } from "../../config/api";
 
 const PAGE_SIZE = 10;
-const API_URL = "http://localhost:5000";
-
 export default function ThesisTable({
   thesis = [],
   onDelete,
@@ -25,7 +24,7 @@ export default function ThesisTable({
 
   const openPdf = (path) => {
     if (!path) return;
-    window.open(`${API_URL}/${path.replace(/\\/g, "/")}`, "_blank");
+    window.open(fileUrl(path), "_blank");
   };
 
   if (!thesis.length) {
@@ -69,7 +68,7 @@ export default function ThesisTable({
                     {item.title || "Untitled thesis"}
                   </p>
                   <p className="mt-1 truncate text-xs text-gray-400">
-                    {item._id}
+                    {item.projectId || "Generating ID"}
                   </p>
                 </td>
                 <td className="px-4 py-3 text-gray-700">
@@ -132,7 +131,9 @@ export default function ThesisTable({
               </div>
               <StatusBadge status={item.status} />
             </div>
-            <p className="mt-3 break-all text-xs text-gray-400">{item._id}</p>
+            <p className="mt-3 text-xs text-gray-500">
+              Project ID: {item.projectId || "Generating ID"}
+            </p>
             <div className="mt-4 flex items-center gap-2 border-t pt-3">
               <button
                 onClick={() => onViewDetails(item._id)}

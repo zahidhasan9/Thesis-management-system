@@ -41,7 +41,6 @@ export default function EditRoleModal({
             onChange={(e) => setNewRole(e.target.value)}
             className="border border-gray-300 rounded-lg p-3 w-full mb-5 focus:outline-none focus:ring-2 focus:ring-gray-300"
           >
-            <option value="student">Student</option>
             <option value="supervisor">Supervisor</option>
             <option value="admin">Admin</option>
             <option value="evaluator">Evaluator</option>

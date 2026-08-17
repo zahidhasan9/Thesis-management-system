@@ -1228,7 +1228,6 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
 
   const [search, setSearch] = useState("");
-  const [userRoleFilter, setUserRoleFilter] = useState("all");
   const [thesisStatusFilter, setThesisStatusFilter] = useState("all");
 
   const [editUser, setEditUser] = useState(null);
@@ -1365,12 +1364,9 @@ export default function AdminDashboard() {
         u.role?.toLowerCase().includes(search.toLowerCase())||
         u.status?.toLowerCase().includes(search.toLowerCase());
 
-      const matchRole =
-        userRoleFilter === "all" ? true : u.role === userRoleFilter;
-
-      return matchSearch && matchRole;
+      return matchSearch;
     });
-  }, [users, search, userRoleFilter]);
+  }, [users, search]);
 
   const filteredThesis = useMemo(() => {
     return thesis.filter((t) =>
@@ -1435,8 +1431,6 @@ export default function AdminDashboard() {
           <UsersSection
             search={search}
             setSearch={setSearch}
-            userRoleFilter={userRoleFilter}
-            setUserRoleFilter={setUserRoleFilter}
             filteredUsers={filteredUsers}
             openEditModal={openEditModal}
             handleDelete={handleDelete}

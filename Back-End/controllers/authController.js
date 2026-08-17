@@ -72,12 +72,26 @@ exports.register = async (req, res) => {
   let createdUserId = null;
 
   try {
-    const { name, email, password, idNo, phone, department, batch, Section } =
-      req.body;
+    const { name, email, password, idNo, phone, department, batch, Section,
+      position, accountType = "student" } = req.body;
 
     if (!name || !email || !password || !idNo || !phone) {
       return res.status(400).json({
         message: "Name, email, password, ID number and phone are required",
+      });
+    }
+
+    if (!["student", "teacher"].includes(accountType)) {
+      return res.status(400).json({ message: "Invalid account type" });
+    }
+
+    if (!department) {
+      return res.status(400).json({ message: "Department is required" });
+    }
+
+    if (accountType === "teacher" && !position) {
+      return res.status(400).json({
+        message: "Designation is required for teachers",
       });
     }
 
@@ -130,8 +144,9 @@ exports.register = async (req, res) => {
       department,
       batch,
       Section,
+      position: accountType === "teacher" ? String(position).trim() : undefined,
       password: passwordHash,
-      role: "student",
+      role: accountType === "teacher" ? "supervisor" : "student",
       status: "pending",
       isActive: false,
       activatedAt: null,

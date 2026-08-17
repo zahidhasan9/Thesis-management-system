@@ -86,6 +86,14 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    university: {
+      type: String,
+      trim: true,
+    },
+    profileImage: {
+      type: String,
+      trim: true,
+    },
     batch: {
       type: String,
       trim: true,

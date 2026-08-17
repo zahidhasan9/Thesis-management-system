@@ -319,6 +319,7 @@ import {
   LibraryBig,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { fileUrl } from "../../config/api";
 
 export default function StudentDashboard() {
   const [thesis, setThesis] = useState([]);
@@ -342,10 +343,6 @@ export default function StudentDashboard() {
       .then((res) => setRecentThesis(res.data))
       .catch(() => toast.error("Failed to load thesis library"));
   }, []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [librarySearch, libraryStatus, libraryDepartment, librarySort, itemsPerPage]);
 
   const stats = useMemo(() => {
     const total = thesis.length;
@@ -481,10 +478,7 @@ export default function StudentDashboard() {
   };
 
   const getPdfUrl = (pdfPath) => {
-    if (!pdfPath) return null;
-
-    const cleanPath = pdfPath.replace(/\\/g, "/").replace(/^\/+/, "");
-    return `http://localhost:5000/${cleanPath}`;
+    return fileUrl(pdfPath);
   };
 
   const handleDelete = (id, status) => {
@@ -739,7 +733,10 @@ export default function StudentDashboard() {
                 <input
                   type="text"
                   value={librarySearch}
-                  onChange={(e) => setLibrarySearch(e.target.value)}
+                  onChange={(e) => {
+                    setLibrarySearch(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   placeholder="Search by title, student, department..."
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
                 />
@@ -750,7 +747,10 @@ export default function StudentDashboard() {
 
                 <select
                   value={libraryStatus}
-                  onChange={(e) => setLibraryStatus(e.target.value)}
+                  onChange={(e) => {
+                    setLibraryStatus(e.target.value);
+                    setCurrentPage(1);
+                  }}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
                 >
                   <option value="all">All Status</option>
@@ -761,7 +761,10 @@ export default function StudentDashboard() {
 
               <select
                 value={libraryDepartment}
-                onChange={(e) => setLibraryDepartment(e.target.value)}
+                onChange={(e) => {
+                  setLibraryDepartment(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
               >
                 <option value="all">All Departments</option>
@@ -774,7 +777,10 @@ export default function StudentDashboard() {
 
               <select
                 value={librarySort}
-                onChange={(e) => setLibrarySort(e.target.value)}
+                onChange={(e) => {
+                  setLibrarySort(e.target.value);
+                  setCurrentPage(1);
+                }}
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-gray-900"
               >
                 <option value="newest">Newest First</option>
@@ -966,7 +972,10 @@ export default function StudentDashboard() {
 
               <select
                 value={itemsPerPage}
-                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value));
+                  setCurrentPage(1);
+                }}
                 className="border border-gray-300 rounded-lg px-2 py-1 bg-white focus:outline-none"
               >
                 <option value={5}>5</option>

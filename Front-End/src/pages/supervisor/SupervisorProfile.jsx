@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import { toast } from "sonner";
-import { User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ProfilePhotoUploader from "../../components/ProfilePhotoUploader";
+import DepartmentSelect from "../../components/DepartmentSelect";
 
 export default function SupervisorProfile() {
   const navigate = useNavigate();
@@ -100,17 +101,11 @@ export default function SupervisorProfile() {
         {/* Profile Summary */}
         <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
           <div className="flex flex-col md:flex-row md:items-center gap-6">
-                <div className="w-24 h-24 rounded-full border-2 border-gray-300 bg-gray-100 flex items-center justify-center overflow-hidden">
-                      {supervisor.avatar ? (
-                        <img
-                          src={supervisor.avatar}
-                          alt="Profile"
-                          className="w-full h-full object-cover"
-                        />
-                        ) : (
-                        <User className="w-10 h-10 text-gray-500" />
-                            )}
-                 </div>
+            <ProfilePhotoUploader
+              user={supervisor}
+              onUpdated={setSupervisor}
+              size="lg"
+            />
 
             <div className="flex-1">
               <h2 className="text-2xl font-semibold text-gray-900">
@@ -240,9 +235,7 @@ export default function SupervisorProfile() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Department
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Enter your department"
+                  <DepartmentSelect
                     value={department}
                     onChange={(e) => setDepartment(e.target.value)}
                     className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-300"

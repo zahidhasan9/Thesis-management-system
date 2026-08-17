@@ -2,6 +2,8 @@ import  { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import axios from "../../api/axios";
+import ProfilePhotoUploader from "../../components/ProfilePhotoUploader";
+import DepartmentSelect from "../../components/DepartmentSelect";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -195,9 +197,7 @@ export default function EvaluatorProfile() {
           <div className="space-y-6 lg:col-span-2">
             <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
               <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                <div className="flex h-20 w-20 items-center justify-center rounded-full border border-gray-200 bg-gray-100">
-                  <UserCircle2 className="h-10 w-10 text-gray-500" />
-                </div>
+                <ProfilePhotoUploader user={user} onUpdated={setUser} />
 
                 <div className="min-w-0 flex-1">
                   <h2 className="text-2xl font-semibold text-gray-900">
@@ -304,11 +304,9 @@ export default function EvaluatorProfile() {
                     <label className="mb-2 block text-sm font-medium text-gray-700">
                       Department
                     </label>
-                    <input
-                      type="text"
+                    <DepartmentSelect
                       value={department}
                       onChange={(e) => setDepartment(e.target.value)}
-                      placeholder="Enter your department"
                       className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
                     />
                   </div>

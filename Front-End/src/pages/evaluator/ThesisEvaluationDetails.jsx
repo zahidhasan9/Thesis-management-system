@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, Check, FileText, Send, X } from "lucide-react";
 import { toast, Toaster } from "sonner";
 import axios from "../../api/axios";
+import { fileUrl } from "../../config/api";
 
 export default function ThesisEvaluationDetails() {
   const { id } = useParams();
@@ -43,7 +44,7 @@ export default function ThesisEvaluationDetails() {
     catch (error) { toast.error(error.response?.data?.message || "Submission failed"); }
     finally { setBusy(false); }
   };
-  const pdfUrl = thesis?.pdf ? `http://localhost:5000/${thesis.pdf.replace(/\\/g, "/")}` : null;
+  const pdfUrl = fileUrl(thesis?.pdf);
   if (!thesis) return <div className="min-h-screen grid place-items-center bg-gray-50">Loading assignment...</div>;
 
   return <main className="min-h-screen bg-gray-50 px-4 py-8"><Toaster richColors />

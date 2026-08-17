@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Thesis = require("../models/Thesis");
+const { assignProjectId, ensureProjectIds } = require("../services/projectId");
 const SubmissionSetting = require("../models/SubmissionSetting");
 const mongoose = require("mongoose");
 
@@ -136,22 +137,12 @@ exports.getAllThesis = async (req, res) => {
       .populate("evaluatorAssignments.evaluator", "name email role")
       .populate({ path: "thirdEvaluatorMark.evaluator" })
       .populate({ path: "evaluatorMarks.evaluator" });
+    await ensureProjectIds(thesis);
     res.json(thesis);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
-};
-
-// Get Single thesis
-exports.getSingleThesis = async (req, res) => {
-  const thesis = await Thesis.findById(req.params.id)
-    .populate("student")
-    .populate("supervisor", "name email")
-    .populate("thirdEvaluatorMark.evaluator")
-    .populate("evaluatorMarks.evaluator");
-
-  res.json(thesis);
 };
 
 // Delete a thesis
@@ -315,22 +306,31 @@ exports.updateAccountStatus = async (req, res) => {
 exports.changeRole = async (req, res) => {
   try {
     const allowedRoles = [
-      "student",
       "supervisor",
       "evaluator",
       "third_evaluator",
       "admin",
     ];
     const { role } = req.body;
+    if (role === "student") {
+      return res.status(400).json({
+        message: "Staff accounts cannot be changed to student",
+      });
+    }
     if (!allowedRoles.includes(role)) {
       return res.status(400).json({ message: "Invalid role" });
     }
-    const user = await User.findByIdAndUpdate(
-      req.params.id,
-      { role },
-      { new: true },
-    );
+
+    const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.role === "student") {
+      return res.status(400).json({
+        message: "Student roles cannot be changed",
+      });
+    }
+
+    user.role = role;
+    await user.save();
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -458,6 +458,10 @@ exports.getSingleThesis = async (req, res) => {
       .populate("evaluatorMarks.evaluator", "name email role")
       .populate("thirdEvaluatorMark.evaluator", "name email role");
     if (!thesis) return res.status(404).json({ message: "Thesis not found" });
+    await assignProjectId(thesis, thesis.student);
+    thesis.evaluationThreshold = Number(
+      process.env.THIRD_EVALUATOR_THRESHOLD || 14,
+    );
     res.json(thesis);
   } catch (err) {
     res.status(500).json({ message: err.message });

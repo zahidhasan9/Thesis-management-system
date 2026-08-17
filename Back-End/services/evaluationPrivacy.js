@@ -1,3 +1,5 @@
+const { gradeFromMark } = require("../utils/grade");
+
 const sanitizeForEvaluator = (source, userId) => {
   const data = source.toObject ? source.toObject() : { ...source };
   const mine = data.evaluatorAssignments?.find(
@@ -33,10 +35,11 @@ const sanitizeForStudent = (source) => {
     "resultPublishedBy",
   ].forEach((field) => delete data[field]);
 
-  if (!data.resultPublished || data.finalMarkStatus !== "published") {
-    delete data.finalMark;
-    delete data.finalMarkCalculatedAt;
-  }
+  const published =
+    data.resultPublished === true && data.finalMarkStatus === "published";
+  data.grade = published ? gradeFromMark(data.finalMark) : undefined;
+  delete data.finalMark;
+  delete data.finalMarkCalculatedAt;
   if (!data.studentFeedbackPublished) {
     delete data.studentFeedback;
     delete data.studentFeedbackPublishedAt;
@@ -47,7 +50,7 @@ const sanitizeForStudent = (source) => {
 const sanitizeForPublicResult = (source) => {
   const data = source.toObject ? source.toObject() : { ...source };
   return {
-    projectId: data._id,
+    projectId: data.projectId || data._id,
     title: data.title,
     status: data.status,
     supervisor: data.supervisor
@@ -56,7 +59,7 @@ const sanitizeForPublicResult = (source) => {
           department: data.supervisor.department,
         }
       : null,
-    finalMark: data.finalMark,
+    grade: gradeFromMark(data.finalMark),
     resultStatus: data.finalMarkStatus,
     publishedAt: data.resultPublishedAt,
     feedback: data.studentFeedbackPublished

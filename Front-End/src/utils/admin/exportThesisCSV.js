@@ -1,7 +1,8 @@
 export const exportThesisCSV = (thesisList = []) => {
-  const headers = ["Title", "Student", "Status", "Final Mark", "Created At"];
+  const headers = ["Project ID", "Title", "Student", "Status", "Final Mark", "Created At"];
 
   const rows = thesisList.map((t) => [
+    t?.projectId || t?._id || "",
     t?.title || "",
     t?.student?.name || "",
     t?.status || "",

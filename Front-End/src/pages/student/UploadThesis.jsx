@@ -1,4 +1,3 @@
-
 // import { useState } from "react";
 // import axios from "../../api/axios";
 // import { toast, Toaster } from "sonner";
@@ -319,7 +318,6 @@
 //   );
 // }
 
-
 import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import { toast, Toaster } from "sonner";
@@ -341,6 +339,10 @@ export default function UploadThesis() {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [aiScore, setAiScore] = useState("");
+  const [plagiarismScore, setPlagiarismScore] = useState("");
+  const [aiCheckUrl, setAiCheckUrl] = useState("");
+  const [plagiarismCheckUrl, setPlagiarismCheckUrl] = useState("");
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -417,13 +419,40 @@ export default function UploadThesis() {
     if (isSubmissionClosed) {
       toast.error(
         deadlineInfo?.message ||
-          "Thesis submission is closed. You cannot upload now."
+          "Thesis submission is closed. You cannot upload now.",
       );
       return;
     }
 
     if (!title || !file) {
       toast.error("Please provide both title and file");
+      return;
+    }
+
+    const parsedAiScore = Number(aiScore);
+    const parsedPlagiarismScore = Number(plagiarismScore);
+    const invalidScore = (value, rawValue) =>
+      rawValue === "" || !Number.isFinite(value) || value < 0 || value >= 25;
+
+    if (
+      invalidScore(parsedAiScore, aiScore) ||
+      invalidScore(parsedPlagiarismScore, plagiarismScore)
+    ) {
+      toast.error("AI and plagiarism scores must be between 0% and less than 25%");
+      return;
+    }
+
+    const isValidReferenceUrl = (value) => {
+      try {
+        const url = new URL(value);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch {
+        return false;
+      }
+    };
+
+    if (!isValidReferenceUrl(aiCheckUrl) || !isValidReferenceUrl(plagiarismCheckUrl)) {
+      toast.error("Please provide valid AI and plagiarism reference links");
       return;
     }
 
@@ -440,13 +469,17 @@ export default function UploadThesis() {
       formData.append("title", title);
       formData.append("pdf", file);
       formData.append("description", description);
+      formData.append("aiScore", String(parsedAiScore));
+      formData.append("plagiarismScore", String(parsedPlagiarismScore));
+      formData.append("aiCheckUrl", aiCheckUrl.trim());
+      formData.append("plagiarismCheckUrl", plagiarismCheckUrl.trim());
 
       await axios.post("/student/upload", formData, {
         onUploadProgress: (progressEvent) => {
           if (!progressEvent.total) return;
 
           const percent = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
+            (progressEvent.loaded * 100) / progressEvent.total,
           );
 
           setUploadProgress(percent);
@@ -457,6 +490,10 @@ export default function UploadThesis() {
 
       setTitle("");
       setDescription("");
+      setAiScore("");
+      setPlagiarismScore("");
+      setAiCheckUrl("");
+      setPlagiarismCheckUrl("");
       setFile(null);
       setUploadProgress(0);
 
@@ -471,6 +508,14 @@ export default function UploadThesis() {
   };
 
   const disableForm = loading || deadlineLoading || isSubmissionClosed;
+  const scoresAreValid =
+    aiScore !== "" &&
+    plagiarismScore !== "" &&
+    Number(aiScore) >= 0 &&
+    Number(aiScore) < 25 &&
+    Number(plagiarismScore) >= 0 &&
+    Number(plagiarismScore) < 25;
+  const linksArePresent = aiCheckUrl.trim() !== "" && plagiarismCheckUrl.trim() !== "";
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -507,8 +552,8 @@ export default function UploadThesis() {
                 deadlineLoading
                   ? "bg-gray-50 border-gray-200"
                   : isSubmissionClosed
-                  ? "bg-red-50 border-red-200"
-                  : "bg-green-50 border-green-200"
+                    ? "bg-red-50 border-red-200"
+                    : "bg-green-50 border-green-200"
               }`}
             >
               <div className="flex items-start gap-3">
@@ -517,8 +562,8 @@ export default function UploadThesis() {
                     deadlineLoading
                       ? "bg-gray-100 text-gray-600"
                       : isSubmissionClosed
-                      ? "bg-red-100 text-red-700"
-                      : "bg-green-100 text-green-700"
+                        ? "bg-red-100 text-red-700"
+                        : "bg-green-100 text-green-700"
                   }`}
                 >
                   {deadlineLoading ? (
@@ -536,15 +581,15 @@ export default function UploadThesis() {
                       deadlineLoading
                         ? "text-gray-700"
                         : isSubmissionClosed
-                        ? "text-red-800"
-                        : "text-green-800"
+                          ? "text-red-800"
+                          : "text-green-800"
                     }`}
                   >
                     {deadlineLoading
                       ? "Checking deadline..."
                       : isSubmissionClosed
-                      ? "Submission Closed"
-                      : "Submission Open"}
+                        ? "Submission Closed"
+                        : "Submission Open"}
                   </p>
 
                   <p className="text-xs text-gray-600 mt-1">
@@ -611,8 +656,7 @@ export default function UploadThesis() {
               {/* Description */}
               <div className="mb-5">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Short Description{" "}
-                  <span className="text-gray-400">(optional)</span>
+                  Abstract <span className="text-gray-400">(abstract)</span>
                 </label>
 
                 <textarea
@@ -622,6 +666,70 @@ export default function UploadThesis() {
                   placeholder="Write a short description about your thesis"
                   className="w-full border border-gray-300 rounded-lg px-3 py-3 min-h-[120px] text-sm resize-none bg-white focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
                 />
+              </div>
+
+              <div className="mb-5 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                    AI Score (%)
+                  </label>
+                  <input
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100"
+                    disabled={disableForm}
+                    max="24.99"
+                    min="0"
+                    onChange={(event) => setAiScore(event.target.value)}
+                    placeholder="e.g. 12.5"
+                    required
+                    step="0.01"
+                    type="number"
+                    value={aiScore}
+                  />
+                  {aiScore !== "" &&
+                    (Number(aiScore) < 0 || Number(aiScore) >= 25) && (
+                      <p className="mt-1 text-xs font-medium text-red-600">
+                        AI score must be less than 25%.
+                      </p>
+                    )}
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">
+                    Plagiarism Score (%)
+                  </label>
+                  <input
+                    className="w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100"
+                    disabled={disableForm}
+                    max="24.99"
+                    min="0"
+                    onChange={(event) => setPlagiarismScore(event.target.value)}
+                    placeholder="e.g. 8"
+                    required
+                    step="0.01"
+                    type="number"
+                    value={plagiarismScore}
+                  />
+                  {plagiarismScore !== "" &&
+                    (Number(plagiarismScore) < 0 ||
+                      Number(plagiarismScore) >= 25) && (
+                      <p className="mt-1 text-xs font-medium text-red-600">
+                        Plagiarism score must be less than 25%.
+                      </p>
+                    )}
+                </div>
+              </div>
+
+              <div className="mb-5 grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">AI Checker Reference Link</label>
+                  <input className="w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100" disabled={disableForm} onChange={(event) => setAiCheckUrl(event.target.value)} placeholder="https://example.com/ai-report" required type="url" value={aiCheckUrl} />
+                  <p className="mt-1 text-xs text-gray-500">Link to the website or report used for the AI score.</p>
+                </div>
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-gray-700">Plagiarism Checker Reference Link</label>
+                  <input className="w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100" disabled={disableForm} onChange={(event) => setPlagiarismCheckUrl(event.target.value)} placeholder="https://example.com/plagiarism-report" required type="url" value={plagiarismCheckUrl} />
+                  <p className="mt-1 text-xs text-gray-500">Link to the website or report used for the plagiarism score.</p>
+                </div>
               </div>
 
               {/* File upload */}
@@ -666,8 +774,8 @@ export default function UploadThesis() {
                       {deadlineLoading
                         ? "Checking submission status..."
                         : isSubmissionClosed
-                        ? "Submission closed"
-                        : "Click to upload PDF"}
+                          ? "Submission closed"
+                          : "Click to upload PDF"}
                     </p>
 
                     <p className="text-xs text-gray-500 mt-1">
@@ -732,9 +840,9 @@ export default function UploadThesis() {
               <div className="flex flex-col sm:flex-row gap-3 pt-6">
                 <button
                   onClick={upload}
-                  disabled={!title || !file || disableForm}
+                  disabled={!title || !file || !scoresAreValid || !linksArePresent || disableForm}
                   className={`flex-1 py-3 rounded-lg text-sm font-medium text-white transition ${
-                    !title || !file || disableForm
+                    !title || !file || !scoresAreValid || !linksArePresent || disableForm
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-gray-900 hover:bg-black"
                   }`}
@@ -742,10 +850,10 @@ export default function UploadThesis() {
                   {loading
                     ? `Uploading ${uploadProgress}%...`
                     : deadlineLoading
-                    ? "Checking Deadline..."
-                    : isSubmissionClosed
-                    ? "Submission Closed"
-                    : "Upload Thesis"}
+                      ? "Checking Deadline..."
+                      : isSubmissionClosed
+                        ? "Submission Closed"
+                        : "Upload Thesis"}
                 </button>
 
                 <button
@@ -753,6 +861,10 @@ export default function UploadThesis() {
                   onClick={() => {
                     setTitle("");
                     setDescription("");
+                    setAiScore("");
+                    setPlagiarismScore("");
+                    setAiCheckUrl("");
+                    setPlagiarismCheckUrl("");
                     setFile(null);
                     setUploadProgress(0);
                   }}
@@ -783,9 +895,7 @@ export default function UploadThesis() {
                     : "bg-green-50 border-green-200"
                 }`}
               >
-                <p className="text-xs text-gray-500 mb-1">
-                  Last Date & Time
-                </p>
+                <p className="text-xs text-gray-500 mb-1">Last Date & Time</p>
 
                 <p
                   className={`text-sm font-semibold ${
@@ -799,8 +909,8 @@ export default function UploadThesis() {
                   {deadlineLoading
                     ? "Checking deadline..."
                     : isSubmissionClosed
-                    ? "Upload is currently disabled."
-                    : "Upload is allowed before this deadline."}
+                      ? "Upload is currently disabled."
+                      : "Upload is allowed before this deadline."}
                 </p>
               </div>
             </div>
@@ -862,7 +972,7 @@ export default function UploadThesis() {
             </div>
           </div>
         </div>
-      </div> 
+      </div>
     </div>
   );
 }

@@ -436,10 +436,11 @@
 
 
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "../../api/axios";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { fileUrl } from "../../config/api";
 import {
   User,
   Mail,
@@ -461,13 +462,7 @@ export default function ReviewPage() {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  const baseURL = "http://localhost:5000";
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const res = await axios.get(`/supervisor/thesis/${id}`);
@@ -480,7 +475,11 @@ export default function ReviewPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -502,9 +501,7 @@ export default function ReviewPage() {
     }
   };
 
-  const pdfUrl = thesis.pdf
-    ? `${baseURL}/${thesis.pdf.replace(/\\/g, "/")}`
-    : null;
+  const pdfUrl = fileUrl(thesis.pdf);
 
   const getStatusClasses = (currentStatus) => {
     switch (currentStatus) {
@@ -599,6 +596,23 @@ export default function ReviewPage() {
                   <span className="font-medium text-gray-800">
                     {formatDate(thesis.updatedAt)}
                   </span>
+                </div>
+              </div>
+
+              <div className="mb-5 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+                  <p className="text-xs font-medium text-blue-600">AI Score</p>
+                  <p className="mt-1 text-xl font-semibold text-blue-900">
+                    {thesis.aiScore == null ? "Not provided" : `${thesis.aiScore}%`}
+                  </p>
+                  {thesis.aiCheckUrl && <a className="mt-2 inline-block text-xs font-semibold text-blue-700 underline" href={thesis.aiCheckUrl} rel="noreferrer" target="_blank">Open reference</a>}
+                </div>
+                <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
+                  <p className="text-xs font-medium text-emerald-600">Plagiarism Score</p>
+                  <p className="mt-1 text-xl font-semibold text-emerald-900">
+                    {thesis.plagiarismScore == null ? "Not provided" : `${thesis.plagiarismScore}%`}
+                  </p>
+                  {thesis.plagiarismCheckUrl && <a className="mt-2 inline-block text-xs font-semibold text-emerald-700 underline" href={thesis.plagiarismCheckUrl} rel="noreferrer" target="_blank">Open reference</a>}
                 </div>
               </div>
 

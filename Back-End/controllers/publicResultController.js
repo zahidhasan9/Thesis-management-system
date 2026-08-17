@@ -40,7 +40,7 @@ exports.lookupResults = async (req, res) => {
       finalMark: { $type: "number" },
     })
       .select(
-        "title status supervisor finalMark finalMarkStatus resultPublishedAt studentFeedback studentFeedbackPublished",
+        "projectId title status supervisor finalMark finalMarkStatus resultPublishedAt studentFeedback studentFeedbackPublished",
       )
       .populate("supervisor", "name department")
       .sort({ resultPublishedAt: -1 });

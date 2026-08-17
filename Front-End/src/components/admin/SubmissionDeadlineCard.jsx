@@ -1,7 +1,14 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios from "../../api/axios";
 import { toast } from "sonner";
 import { CalendarDays, Save, AlertTriangle, CheckCircle2 } from "lucide-react";
+
+const formatForInput = (dateValue) => {
+  if (!dateValue) return "";
+  const date = new Date(dateValue);
+  const offset = date.getTimezoneOffset();
+  return new Date(date.getTime() - offset * 60000).toISOString().slice(0, 16);
+};
 
 export default function SubmissionDeadlineCard() {
   const [deadline, setDeadline] = useState("");
@@ -9,17 +16,7 @@ export default function SubmissionDeadlineCard() {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const formatForInput = (dateValue) => {
-    if (!dateValue) return "";
-
-    const date = new Date(dateValue);
-    const offset = date.getTimezoneOffset();
-    const localDate = new Date(date.getTime() - offset * 60000);
-
-    return localDate.toISOString().slice(0, 16);
-  };
-
-  const loadSetting = async () => {
+  const loadSetting = useCallback(async () => {
     try {
       const res = await axios.get("/admin/submission-setting");
 
@@ -29,11 +26,11 @@ export default function SubmissionDeadlineCard() {
     } catch {
       toast.error("Failed to load submission deadline");
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadSetting();
-  }, []);
+  }, [loadSetting]);
 
   const handleSave = async () => {
     if (!deadline) {

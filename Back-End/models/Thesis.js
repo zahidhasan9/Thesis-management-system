@@ -2,7 +2,20 @@ const mongoose = require("mongoose")
 
 const thesisSchema = new mongoose.Schema({
 
+ projectId:{
+  type:String,
+  trim:true,
+  unique:true,
+  sparse:true
+ },
+ academicSession:{type:String,trim:true},
+ sessionSerial:{type:Number,min:1},
+
  title:String,
+ aiScore:{type:Number,min:0,validate:{validator:(value)=>value<25,message:"AI score must be less than 25%"}},
+ plagiarismScore:{type:Number,min:0,validate:{validator:(value)=>value<25,message:"Plagiarism score must be less than 25%"}},
+ aiCheckUrl:{type:String,trim:true},
+ plagiarismCheckUrl:{type:String,trim:true},
 
  student:{
   type:mongoose.Schema.Types.ObjectId,
@@ -112,7 +125,7 @@ const thesisSchema = new mongoose.Schema({
  thirdEvaluatorRequirementReason:String,
  thirdEvaluatorRequiredBy:{type:mongoose.Schema.Types.ObjectId,ref:"User"},
  thirdEvaluatorRequiredAt:Date,
- evaluationThreshold:{type:Number,default:()=>Number(process.env.THIRD_EVALUATOR_THRESHOLD || 10)},
+ evaluationThreshold:{type:Number,default:()=>Number(process.env.THIRD_EVALUATOR_THRESHOLD || 14)},
  resultPublished:{type:Boolean,default:false},
  resultPublishedAt:Date,
  resultPublishedBy:{type:mongoose.Schema.Types.ObjectId,ref:"User"}
