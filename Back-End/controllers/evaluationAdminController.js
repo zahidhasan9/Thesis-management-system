@@ -143,7 +143,7 @@ exports.assignCoreTeam = async (req, res) => {
       (item) => item.position === 3,
     );
     if (
-      existingThird &&
+      existingThird?.evaluator &&
       ids.map(String).includes(existingThird.evaluator.toString())
     ) {
       return res.status(400).json({
@@ -182,7 +182,7 @@ exports.assignCoreTeam = async (req, res) => {
         const current = oldAssignments.find(
           (item) => item.position === index + 1,
         );
-        return current?.evaluator.toString() !== String(evaluator);
+        return current?.evaluator?.toString() !== String(evaluator);
       });
     const wasPublished = thesis.resultPublished;
     thesis.supervisor = supervisorId;
@@ -196,7 +196,7 @@ exports.assignCoreTeam = async (req, res) => {
       const same = oldAssignments.find(
         (item) =>
           item.position === position &&
-          item.evaluator.toString() === String(evaluator),
+          item.evaluator?.toString() === String(evaluator),
       );
       if (same) {
         if (deadline) same.deadline = deadline;
@@ -235,8 +235,11 @@ exports.assignCoreTeam = async (req, res) => {
       (item) => item.position <= 2 && item.status === "pending",
     )) {
       const faculty = staff.find(
-        (item) => item._id.toString() === assignment.evaluator.toString(),
+        (item) => item._id.toString() === assignment.evaluator?.toString(),
       );
+      // A legacy assignment can reference a faculty account that was deleted.
+      // It must not make an otherwise valid reassignment fail with a 500 error.
+      if (!faculty) continue;
       await updateEmailStatus(thesis, assignment, () =>
         sendAssignmentEmail({
           user: faculty,

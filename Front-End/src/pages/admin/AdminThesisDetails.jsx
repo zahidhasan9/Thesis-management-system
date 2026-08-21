@@ -151,6 +151,9 @@ export default function AdminThesisDetails() {
       "Review team assigned",
     );
 
+  const coreSelectionComplete =
+    Boolean(supervisorId) && evaluatorIds.every(Boolean);
+
   const requireThird = (reason) =>
     run(
       "require-third",
@@ -291,8 +294,7 @@ export default function AdminThesisDetails() {
             <button
               disabled={
                 busy === "core" ||
-                !supervisorId ||
-                evaluatorIds.some((value) => !value)
+                !coreSelectionComplete
               }
               onClick={assignCore}
               className="inline-flex items-center justify-center gap-2 rounded-md bg-gray-900 px-4 py-2.5 text-sm text-white disabled:opacity-50"
@@ -301,6 +303,16 @@ export default function AdminThesisDetails() {
               {busy === "core" ? "Saving..." : "Save & Send Requests"}
             </button>
             </div>
+            {!coreSelectionComplete && (
+              <p className="mt-3 text-sm text-amber-700">
+                Select one supervisor and two different evaluators to enable assignment.
+              </p>
+            )}
+            {staff.length < 3 && (
+              <p className="mt-3 text-sm text-red-700">
+                At least three active faculty accounts are required. Activate more faculty from Users first.
+              </p>
+            )}
 
             <div className="mt-6 border-t pt-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
@@ -660,7 +672,7 @@ function FacultySelect({ label, value, onChange, options }) {
 
   if (!label) {
     return (
-      <div className="relative">
+      <div ref={rootRef} className="relative">
         <button
           aria-expanded={open}
           className="flex h-11 w-full items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 text-left text-sm font-medium text-gray-800 outline-none transition hover:border-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
