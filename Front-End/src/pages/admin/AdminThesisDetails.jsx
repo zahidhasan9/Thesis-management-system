@@ -31,6 +31,7 @@ import { fileUrl } from "../../config/api";
 import { exportEvaluationPDF } from "../../utils/admin/exportEvaluationPDF";
 
 const statusStyle = {
+  awaiting_supervisor: "bg-slate-100 text-slate-700",
   accepted: "bg-emerald-100 text-emerald-700",
   evaluation_pending: "bg-blue-100 text-blue-700",
   mark_submitted: "bg-emerald-100 text-emerald-700",
