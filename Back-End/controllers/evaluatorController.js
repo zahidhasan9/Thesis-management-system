@@ -18,6 +18,7 @@ const validThesisId = (id) => mongoose.isValidObjectId(id);
 exports.getAccepted = async (req, res) => {
   try {
     const theses = await Thesis.find({
+      "supervisorRequest.status": "accepted",
       evaluatorAssignments: { $elemMatch: { evaluator: req.user._id } },
     })
       .populate("student", "name idNo department")
@@ -47,6 +48,11 @@ exports.respondToAssignment = async (req, res) => {
     }
     const thesis = await Thesis.findById(req.params.id);
     if (!thesis) return res.status(404).json({ message: "Thesis not found" });
+    if (thesis.supervisorRequest?.status !== "accepted") {
+      return res.status(409).json({
+        message: "The Supervisor must accept this thesis before Evaluators can respond",
+      });
+    }
     const assignment = assignmentFor(thesis, req.user._id);
     if (!assignment) {
       return res.status(403).json({
@@ -149,6 +155,11 @@ exports.submitMark = async (req, res) => {
     }
     const thesis = await Thesis.findById(req.body.thesisId);
     if (!thesis) return res.status(404).json({ message: "Thesis not found" });
+    if (thesis.supervisorRequest?.status !== "accepted") {
+      return res.status(409).json({
+        message: "The Supervisor must accept this thesis before evaluation can begin",
+      });
+    }
     const assignment = assignmentFor(thesis, req.user._id);
     if (!assignment) {
       return res.status(403).json({
@@ -260,6 +271,11 @@ exports.getThesisById = async (req, res) => {
       .populate("student", "name idNo department")
       .populate("evaluatorAssignments.evaluator", "name email role");
     if (!thesis) return res.status(404).json({ message: "Thesis not found" });
+    if (thesis.supervisorRequest?.status !== "accepted") {
+      return res.status(409).json({
+        message: "This assignment will become available after the Supervisor accepts it",
+      });
+    }
     if (!assignmentFor(thesis, req.user._id)) {
       return res.status(403).json({
         message: "This thesis is not assigned to you",

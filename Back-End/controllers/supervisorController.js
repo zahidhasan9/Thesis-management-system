@@ -3,6 +3,7 @@ const User = require("../models/User");
 const mongoose = require("mongoose");
 const { recordAudit } = require("../utils/audit");
 const { sendEmail } = require("../utils/mailer");
+const { sendAssignmentEmail } = require("../utils/assignmentEmail");
 const { notifyAdmins } = require("../utils/notifications");
 
 exports.getAllThesis = async (req, res) => {
@@ -32,6 +33,14 @@ exports.reviewThesis = async (req, res) => {
     const thesis = await Thesis.findOne({ _id: thesisId, supervisor: req.user._id });
     if (!thesis) return res.status(404).json({ message: "Assigned thesis not found" });
     const previousStatus = thesis.supervisorRequest?.status;
+    const evaluatorAssignmentsToActivate =
+      normalized === "accepted" && previousStatus !== "accepted"
+        ? thesis.evaluatorAssignments.filter(
+            (assignment) =>
+              assignment.position <= 2 &&
+              assignment.status === "awaiting_supervisor",
+          )
+        : [];
     thesis.supervisorRequest.status = normalized;
     thesis.supervisorRequest.note = note;
     thesis.supervisorRequest.rejectionReason =
@@ -39,6 +48,10 @@ exports.reviewThesis = async (req, res) => {
     thesis.supervisorRequest.respondedAt = new Date();
     thesis.supervisorNote = note;
     thesis.status = normalized === "accepted" ? "accepted" : "declined";
+    evaluatorAssignmentsToActivate.forEach((assignment) => {
+      assignment.status = "pending";
+      assignment.emailDelivery = { status: "pending" };
+    });
     await thesis.save();
     await recordAudit({
       thesis: thesis._id,
@@ -51,6 +64,43 @@ exports.reviewThesis = async (req, res) => {
       user: req.user,
       reason: normalized === "rejected" ? note : undefined,
     });
+    if (evaluatorAssignmentsToActivate.length) {
+      const [emailThesis, evaluators] = await Promise.all([
+        Thesis.findById(thesis._id).populate("student", "name email"),
+        User.find({
+          _id: {
+            $in: evaluatorAssignmentsToActivate.map(
+              (assignment) => assignment.evaluator,
+            ),
+          },
+          status: "active",
+          isActive: true,
+        }),
+      ]);
+      for (const assignment of evaluatorAssignmentsToActivate) {
+        const evaluator = evaluators.find(
+          (user) =>
+            user._id.toString() === assignment.evaluator?.toString(),
+        );
+        try {
+          if (!evaluator) throw new Error("Evaluator account is not active");
+          await sendAssignmentEmail({
+            user: evaluator,
+            thesis: emailThesis,
+            position: assignment.position,
+            deadline: assignment.deadline,
+          });
+          assignment.emailDelivery = { status: "sent", sentAt: new Date() };
+        } catch (error) {
+          console.error("Evaluator assignment email failed:", error.message);
+          assignment.emailDelivery = {
+            status: "failed",
+            error: error.message.slice(0, 500),
+          };
+        }
+      }
+      await thesis.save();
+    }
     if (normalized === "rejected") {
       await notifyAdmins({
         thesis: thesis._id,

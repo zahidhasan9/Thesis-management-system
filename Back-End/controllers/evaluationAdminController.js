@@ -176,6 +176,9 @@ exports.assignCoreTeam = async (req, res) => {
     };
     const oldAssignments = thesis.evaluatorAssignments || [];
     const oldSupervisorId = thesis.supervisor?.toString();
+    const supervisorAlreadyAccepted =
+      oldSupervisorId === String(supervisorId) &&
+      thesis.supervisorRequest?.status === "accepted";
     const coreChanged =
       oldSupervisorId !== String(supervisorId) ||
       evaluatorIds.some((evaluator, index) => {
@@ -202,7 +205,13 @@ exports.assignCoreTeam = async (req, res) => {
         if (deadline) same.deadline = deadline;
         return same;
       }
-      return { evaluator, position, status: "pending", mark: null, deadline };
+      return {
+        evaluator,
+        position,
+        status: supervisorAlreadyAccepted ? "pending" : "awaiting_supervisor",
+        mark: null,
+        deadline,
+      };
     });
     thesis.evaluatorAssignments = third ? [...firstTwo, third] : firstTwo;
     thesis.evaluators = thesis.evaluatorAssignments.map((item) => item.evaluator);
@@ -232,7 +241,10 @@ exports.assignCoreTeam = async (req, res) => {
       );
     }
     for (const assignment of thesis.evaluatorAssignments.filter(
-      (item) => item.position <= 2 && item.status === "pending",
+      (item) =>
+        supervisorAlreadyAccepted &&
+        item.position <= 2 &&
+        item.status === "pending",
     )) {
       const faculty = staff.find(
         (item) => item._id.toString() === assignment.evaluator?.toString(),

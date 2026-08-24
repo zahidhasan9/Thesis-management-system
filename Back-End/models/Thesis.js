@@ -57,7 +57,7 @@ const thesisSchema = new mongoose.Schema({
  evaluatorAssignments:[{
   evaluator:{type:mongoose.Schema.Types.ObjectId,ref:"User",required:true},
   position:{type:Number,enum:[1,2,3],required:true},
-  status:{type:String,enum:["pending","accepted","rejected","reassigned","evaluation_pending","mark_submitted","completed"],default:"pending"},
+  status:{type:String,enum:["awaiting_supervisor","pending","accepted","rejected","reassigned","evaluation_pending","mark_submitted","completed"],default:"awaiting_supervisor"},
   respondedAt:Date,
   rejectionReason:{type:String,trim:true},
   note:{type:String,trim:true},
