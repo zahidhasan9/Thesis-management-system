@@ -11,7 +11,11 @@ router.post(
   protect,
   allowRoles("student"),
   student.checkSubmissionDeadline,
-  upload.single("pdf"),
+  upload.fields([
+    { name: "pdf", maxCount: 1 },
+    { name: "aiReportPdf", maxCount: 1 },
+    { name: "plagiarismReportPdf", maxCount: 1 },
+  ]),
   student.uploadThesis
 );
 
@@ -46,6 +50,13 @@ router.get(
   protect,
   allowRoles("student"),
   student.getSingleThesis
+);
+
+router.get(
+  "/thesis/:id/timeline",
+  protect,
+  allowRoles("student"),
+  student.getThesisTimeline,
 );
 
 router.delete("/thesis/:id",

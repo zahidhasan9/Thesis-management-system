@@ -27,24 +27,31 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-teal-50 flex flex-col">
       
       {/* Navbar */}
-      <nav className="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
-        <h1 className="text-2xl font-bold text-blue-600">Thesis Management Portal</h1>
-        <div className="space-x-4">
+      <nav className="sticky top-0 z-50 flex flex-col gap-3 bg-white p-4 shadow-md sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <img
+            src="/nstu-logo.png"
+            alt="NSTU logo"
+            className="h-11 w-11 rounded-full object-contain"
+          />
+          <h1 className="text-lg font-bold text-blue-600 sm:text-2xl">Thesis Management Portal</h1>
+        </div>
+        <div className="flex flex-wrap gap-2 sm:justify-end">
           <button
             onClick={() => navigate("/results")}
-            className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200"
+            className="px-3 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors duration-200 sm:px-4"
           >
             Verify Result
           </button>
           <button
             onClick={() => navigate("/login")}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200"
+            className="px-3 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors duration-200 sm:px-4"
           >
             Login
           </button>
           <button
             onClick={() => navigate("/register")}
-            className="px-4 py-2 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition-colors duration-200"
+            className="px-3 py-2 bg-teal-500 text-white rounded-lg font-semibold hover:bg-teal-600 transition-colors duration-200 sm:px-4"
           >
             Register
           </button>

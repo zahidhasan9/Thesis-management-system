@@ -344,6 +344,8 @@ export default function UploadThesis() {
   const [aiCheckUrl, setAiCheckUrl] = useState("");
   const [plagiarismCheckUrl, setPlagiarismCheckUrl] = useState("");
   const [file, setFile] = useState(null);
+  const [aiReportFile, setAiReportFile] = useState(null);
+  const [plagiarismReportFile, setPlagiarismReportFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -473,6 +475,8 @@ export default function UploadThesis() {
       formData.append("plagiarismScore", String(parsedPlagiarismScore));
       formData.append("aiCheckUrl", aiCheckUrl.trim());
       formData.append("plagiarismCheckUrl", plagiarismCheckUrl.trim());
+      if (aiReportFile) formData.append("aiReportPdf", aiReportFile);
+      if (plagiarismReportFile) formData.append("plagiarismReportPdf", plagiarismReportFile);
 
       await axios.post("/student/upload", formData, {
         onUploadProgress: (progressEvent) => {
@@ -495,6 +499,8 @@ export default function UploadThesis() {
       setAiCheckUrl("");
       setPlagiarismCheckUrl("");
       setFile(null);
+      setAiReportFile(null);
+      setPlagiarismReportFile(null);
       setUploadProgress(0);
 
       loadSubmissionStatus();
@@ -720,6 +726,11 @@ export default function UploadThesis() {
               </div>
 
               <div className="mb-5 grid gap-4 sm:grid-cols-2">
+                <ReportUpload label="AI Report PDF (optional)" file={aiReportFile} disabled={disableForm} onChange={setAiReportFile} />
+                <ReportUpload label="Plagiarism Report PDF (optional)" file={plagiarismReportFile} disabled={disableForm} onChange={setPlagiarismReportFile} />
+              </div>
+
+              <div className="mb-5 grid gap-4 sm:grid-cols-2">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-gray-700">AI Checker Reference Link</label>
                   <input className="w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100" disabled={disableForm} onChange={(event) => setAiCheckUrl(event.target.value)} placeholder="https://example.com/ai-report" required type="url" value={aiCheckUrl} />
@@ -866,6 +877,8 @@ export default function UploadThesis() {
                     setAiCheckUrl("");
                     setPlagiarismCheckUrl("");
                     setFile(null);
+                    setAiReportFile(null);
+                    setPlagiarismReportFile(null);
                     setUploadProgress(0);
                   }}
                   disabled={loading}
@@ -974,5 +987,28 @@ export default function UploadThesis() {
         </div>
       </div>
     </div>
+  );
+}
+
+function ReportUpload({ label, file, disabled, onChange }) {
+  return (
+    <label className="block text-sm font-medium text-gray-700">
+      {label}
+      <span className="mt-2 flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-3 text-sm font-normal text-gray-600 hover:bg-gray-100">
+        <FileText className="shrink-0 text-gray-500" size={18} />
+        <span className="min-w-0 flex-1 truncate">{file?.name || "Choose report PDF"}</span>
+        <input
+          accept=".pdf,application/pdf"
+          className="hidden"
+          disabled={disabled}
+          onChange={(event) => {
+            const selected = event.target.files?.[0];
+            if (selected && selected.type !== "application/pdf") return toast.error("Only PDF files are allowed");
+            onChange(selected || null);
+          }}
+          type="file"
+        />
+      </span>
+    </label>
   );
 }

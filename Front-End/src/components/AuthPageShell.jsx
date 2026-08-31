@@ -11,12 +11,12 @@ export default function AuthPageShell({
       <div className="mx-auto grid min-h-[640px] max-w-5xl overflow-hidden rounded-3xl bg-white shadow-xl lg:grid-cols-2">
         <section className="flex flex-col justify-between bg-slate-950 p-8 text-white sm:p-12">
           <div>
-            <Link
+            {/* <Link
               to="/"
               className="inline-flex rounded-full bg-white/10 px-4 py-2 text-sm font-semibold text-slate-100"
             >
               PermisGo Auto
-            </Link>
+            </Link> */}
 
             <h1 className="mt-10 text-4xl font-bold leading-tight">
               Thesis Management System

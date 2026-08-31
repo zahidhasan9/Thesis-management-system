@@ -28,6 +28,7 @@ import EvaluatorProfile from "./pages/evaluator/Profile";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminThesisDetails from "./pages/admin/AdminThesisDetails";
 import PublicResults from "./pages/public/PublicResults";
+import NotFound from "./pages/NotFound";
 
 function App() {
   return (
@@ -162,6 +163,7 @@ function App() {
           }
           path="/review/:id"
         />
+        <Route element={<NotFound />} path="*" />
       </Routes>
     </BrowserRouter>
   );

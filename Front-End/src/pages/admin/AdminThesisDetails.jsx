@@ -252,7 +252,9 @@ export default function AdminThesisDetails() {
           </div>
           <div className="mt-3 flex flex-wrap gap-3 text-sm">
             {thesis.aiCheckUrl && <a className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 font-medium text-blue-700 hover:bg-blue-100" href={thesis.aiCheckUrl} rel="noreferrer" target="_blank">Open AI Check Reference</a>}
+            {thesis.aiReportPdf && <a className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 font-medium text-blue-700 hover:bg-blue-100" href={fileUrl(thesis.aiReportPdf)} rel="noreferrer" target="_blank">View AI Report PDF</a>}
             {thesis.plagiarismCheckUrl && <a className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 font-medium text-emerald-700 hover:bg-emerald-100" href={thesis.plagiarismCheckUrl} rel="noreferrer" target="_blank">Open Plagiarism Reference</a>}
+            {thesis.plagiarismReportPdf && <a className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 font-medium text-emerald-700 hover:bg-emerald-100" href={fileUrl(thesis.plagiarismReportPdf)} rel="noreferrer" target="_blank">View Plagiarism Report PDF</a>}
           </div>
         </section>
 
@@ -280,7 +282,7 @@ export default function AdminThesisDetails() {
             <div className="p-5">
             <AssignmentTable rows={[
               { role: "Supervisor", value: supervisorId, onChange: setSupervisorId, options: options(supervisorId) },
-              ...evaluatorIds.map((value, index) => ({ role: `${index === 0 ? "First" : "Second"} Evaluator`, value, options: options(value), onChange: (next) => setEvaluatorIds((old) => old.map((item, itemIndex) => itemIndex === index ? next : item)) })),
+              ...evaluatorIds.map((value, index) => ({ role: `${index === 0 ? "First" : "Second"} Evaluator`, value, options: options(value), disabled: index === 0 && first?.mark != null, onChange: (next) => setEvaluatorIds((old) => old.map((item, itemIndex) => itemIndex === index ? next : item)) })),
             ]} />
             <div className="mt-5 flex flex-col gap-4 border-t border-gray-200 pt-5 sm:flex-row sm:items-end sm:justify-between">
             <label className="block flex-1 text-sm font-medium text-gray-700">
@@ -644,7 +646,7 @@ function AssignmentTable({ rows }) {
             return (
               <tr className={`border-t border-gray-100 align-middle transition ${person ? "bg-blue-50/30 hover:bg-blue-50/60" : "hover:bg-gray-50/60"}`} key={row.role}>
                 <td className="px-4 py-4"><span className="rounded-full bg-gray-900 px-3 py-1.5 text-xs font-semibold text-white">{row.role}</span></td>
-                <td className="w-[320px] px-4 py-3"><FacultySelect label="" onChange={row.onChange} options={row.options} value={row.value} /></td>
+                <td className="w-[320px] px-4 py-3"><FacultySelect disabled={row.disabled} label="" onChange={row.onChange} options={row.options} value={row.value} /></td>
                 <td className="px-4 py-4 text-gray-600">{person?.department || "—"}</td>
                 <td className="px-4 py-4 text-gray-600">{person?.university || (person ? "NSTU" : "—")}</td>
                 <td className="px-4 py-4 capitalize text-gray-600">{person ? (person.position || person.role || "Faculty").replaceAll("_", " ") : "—"}</td>
@@ -658,7 +660,7 @@ function AssignmentTable({ rows }) {
   );
 }
 
-function FacultySelect({ label, value, onChange, options }) {
+function FacultySelect({ label, value, onChange, options, disabled = false }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
   const selected = options.find((person) => person._id === value);
@@ -676,7 +678,8 @@ function FacultySelect({ label, value, onChange, options }) {
       <div ref={rootRef} className="relative">
         <button
           aria-expanded={open}
-          className="flex h-11 w-full items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 text-left text-sm font-medium text-gray-800 outline-none transition hover:border-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100"
+          disabled={disabled}
+          className="flex h-11 w-full items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 text-left text-sm font-medium text-gray-800 outline-none transition hover:border-gray-400 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-gray-100"
           onClick={() => setOpen((current) => !current)}
           type="button"
         >

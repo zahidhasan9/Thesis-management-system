@@ -175,6 +175,15 @@ exports.assignCoreTeam = async (req, res) => {
         })),
     };
     const oldAssignments = thesis.evaluatorAssignments || [];
+    const firstAssignment = oldAssignments.find((item) => item.position === 1);
+    if (
+      firstAssignment?.mark != null &&
+      firstAssignment.evaluator?.toString() !== String(evaluatorIds[0])
+    ) {
+      return res.status(409).json({
+        message: "First Evaluator has already submitted a mark and cannot be reassigned",
+      });
+    }
     const oldSupervisorId = thesis.supervisor?.toString();
     const supervisorAlreadyAccepted =
       oldSupervisorId === String(supervisorId) &&

@@ -3,10 +3,15 @@ const User = require("../models/User")
 const SubmissionSetting = require("../models/SubmissionSetting");
 const { sanitizeForStudent } = require("../services/evaluationPrivacy");
 const { assignProjectId } = require("../services/projectId");
+const AuditLog = require("../models/AuditLog");
+const { recordAudit } = require("../utils/audit");
 const fs = require("fs");
 
-const removeUploadedFile = (file) => {
-  if (file?.path) fs.promises.unlink(file.path).catch(() => undefined);
+const uploadedFiles = (req) => Object.values(req.files || {}).flat();
+const removeUploadedFiles = (files) => {
+  files.filter(Boolean).forEach((file) => {
+    if (file?.path) fs.promises.unlink(file.path).catch(() => undefined);
+  });
 };
 
 exports.uploadThesis = async(req,res)=>{
@@ -20,8 +25,10 @@ exports.uploadThesis = async(req,res)=>{
  const aiCheckUrl = String(req.body.aiCheckUrl || "").trim();
  const plagiarismCheckUrl = String(req.body.plagiarismCheckUrl || "").trim();
 
- if (!title || !req.file) {
-  removeUploadedFile(req.file);
+ const files = uploadedFiles(req);
+ const thesisPdf = req.files?.pdf?.[0];
+ if (!title || !thesisPdf) {
+  removeUploadedFiles(files);
   return res.status(400).json({message:"Title and thesis PDF are required"});
  }
 
@@ -30,7 +37,7 @@ exports.uploadThesis = async(req,res)=>{
   !Number.isFinite(score) || score < 0 || score >= 25;
 
  if (invalidScore(aiScore, aiScoreInput) || invalidScore(plagiarismScore, plagiarismScoreInput)) {
-  removeUploadedFile(req.file);
+  removeUploadedFiles(files);
   return res.status(400).json({
    message:"AI and plagiarism scores must be between 0% and less than 25%"
   });
@@ -46,7 +53,7 @@ exports.uploadThesis = async(req,res)=>{
  };
 
  if (!isValidReferenceUrl(aiCheckUrl) || !isValidReferenceUrl(plagiarismCheckUrl)) {
-  removeUploadedFile(req.file);
+  removeUploadedFiles(files);
   return res.status(400).json({
    message:"Valid AI and plagiarism reference links are required"
   });
@@ -64,15 +71,23 @@ exports.uploadThesis = async(req,res)=>{
   aiCheckUrl,
   plagiarismCheckUrl,
 
-  pdf:req.file.path
+  pdf:thesisPdf.path,
+  aiReportPdf:req.files?.aiReportPdf?.[0]?.path,
+  plagiarismReportPdf:req.files?.plagiarismReportPdf?.[0]?.path,
 
   })
 
   await assignProjectId(thesis, req.user)
+  await recordAudit({
+   thesis: thesis._id,
+   action: "THESIS_SUBMITTED",
+   newValue: { submittedAt: thesis.createdAt },
+   user: req.user,
+  });
 
   return res.status(201).json(thesis)
  } catch (error) {
-  removeUploadedFile(req.file);
+  removeUploadedFiles(files);
   console.error("Thesis upload error:", error);
   return res.status(500).json({message:"Thesis upload failed"});
  }
@@ -83,7 +98,7 @@ exports.myThesis = async(req,res)=>{
 
  const thesis = await Thesis.find({
   student:req.user._id
- }).populate("supervisor", "name email department phone")
+ }).populate("supervisor", "idNo")
    .select("-evaluatorMarks -thirdEvaluatorMark -evaluatorAssignments")
    .lean()
 
@@ -116,7 +131,7 @@ exports.getSingleThesis = async (req, res) => {
       student: req.user._id,
     })
       .populate("student", "name email idNo phone")
-      .populate("supervisor", "name email department phone")
+      .populate("supervisor", "idNo")
       .select("-evaluatorMarks -thirdEvaluatorMark -evaluatorAssignments.mark -evaluatorAssignments.feedback -evaluatorAssignments.evaluator");
 
     if (!thesis) {
@@ -132,6 +147,39 @@ exports.getSingleThesis = async (req, res) => {
       message: "Server error",
     });
   }
+};
+
+exports.getThesisTimeline = async (req, res) => {
+ try {
+  const thesis = await Thesis.findOne({ _id: req.params.id, student: req.user._id })
+   .select("createdAt finalMarkStatus resultPublished resultPublishedAt");
+  if (!thesis) return res.status(404).json({ message: "Thesis not found" });
+  const actionDetails = {
+   THESIS_SUBMITTED: "Thesis submitted",
+   SUPERVISOR_ASSIGNMENT_ACCEPTED: "Supervisor accepted thesis",
+   EVALUATOR_ASSIGNMENT_ACCEPTED: "Evaluator accepted review assignment",
+   EVALUATOR_MARK_SUBMITTED: "Evaluator review completed",
+   FINAL_MARK_CALCULATED: "Evaluation completed",
+   FINAL_MARK_APPROVED: "Final result approved",
+   RESULT_PUBLISHED: "Result published",
+  };
+  const logs = await AuditLog.find({ thesis: thesis._id, action: { $in: Object.keys(actionDetails) } })
+   .select("action createdAt newValue")
+   .sort({ createdAt: 1 })
+   .lean();
+  const timeline = logs.map((log) => ({
+   action: log.action,
+   label: actionDetails[log.action],
+   at: log.createdAt,
+   position: log.newValue?.position,
+  }));
+  if (!timeline.some((item) => item.action === "THESIS_SUBMITTED")) {
+   timeline.unshift({ action: "THESIS_SUBMITTED", label: "Thesis submitted", at: thesis.createdAt });
+  }
+  res.json(timeline);
+ } catch (error) {
+  res.status(500).json({ message: "Could not load thesis timeline" });
+ }
 };
 
 

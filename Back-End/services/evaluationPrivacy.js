@@ -44,6 +44,8 @@ const sanitizeForStudent = (source) => {
     delete data.studentFeedback;
     delete data.studentFeedbackPublishedAt;
   }
+  const supervisorId = data.supervisor?.idNo;
+  data.supervisor = supervisorId ? { idNo: String(supervisorId) } : null;
   return data;
 };
 
