@@ -606,6 +606,7 @@ export default function ReviewPage() {
                     {thesis.aiScore == null ? "Not provided" : `${thesis.aiScore}%`}
                   </p>
                   {thesis.aiCheckUrl && <a className="mt-2 inline-block text-xs font-semibold text-blue-700 underline" href={thesis.aiCheckUrl} rel="noreferrer" target="_blank">Open reference</a>}
+                  {thesis.aiReportPdf && <a className="mt-2 ml-3 inline-block text-xs font-semibold text-blue-700 underline" href={fileUrl(thesis.aiReportPdf)} rel="noreferrer" target="_blank">View report PDF</a>}
                 </div>
                 <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
                   <p className="text-xs font-medium text-emerald-600">Plagiarism Score</p>
@@ -613,6 +614,7 @@ export default function ReviewPage() {
                     {thesis.plagiarismScore == null ? "Not provided" : `${thesis.plagiarismScore}%`}
                   </p>
                   {thesis.plagiarismCheckUrl && <a className="mt-2 inline-block text-xs font-semibold text-emerald-700 underline" href={thesis.plagiarismCheckUrl} rel="noreferrer" target="_blank">Open reference</a>}
+                  {thesis.plagiarismReportPdf && <a className="mt-2 ml-3 inline-block text-xs font-semibold text-emerald-700 underline" href={fileUrl(thesis.plagiarismReportPdf)} rel="noreferrer" target="_blank">View report PDF</a>}
                 </div>
               </div>
 
@@ -735,16 +737,15 @@ export default function ReviewPage() {
               {pdfUrl ? (
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <p className="text-sm text-gray-600">
-                    Open the submitted thesis PDF to review the full document.
+                    Download the submitted thesis PDF to review the full document.
                   </p>
 
                   <a
                     href={pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    download
                     className="text-sm bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-black transition w-fit"
                   >
-                    View PDF
+                    Download PDF
                   </a>
                 </div>
               ) : (

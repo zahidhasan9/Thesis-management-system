@@ -132,7 +132,7 @@ exports.getSingleThesis = async (req, res) => {
     })
       .populate("student", "name email idNo phone")
       .populate("supervisor", "idNo")
-      .select("-evaluatorMarks -thirdEvaluatorMark -evaluatorAssignments.mark -evaluatorAssignments.feedback -evaluatorAssignments.evaluator");
+      .select("-evaluatorMarks -thirdEvaluatorMark -evaluatorAssignments.mark -evaluatorAssignments.evaluator");
 
     if (!thesis) {
       return res.status(404).json({

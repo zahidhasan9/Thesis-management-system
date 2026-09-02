@@ -24,6 +24,16 @@ const sanitizeForEvaluator = (source, userId) => {
 
 const sanitizeForStudent = (source) => {
   const data = source.toObject ? source.toObject() : { ...source };
+  const evaluatorFeedback = (data.evaluatorAssignments || [])
+    .filter(
+      (assignment) =>
+        assignment.status === "mark_submitted" && assignment.feedback?.trim(),
+    )
+    .map(({ position, feedback, submittedAt }) => ({
+      position,
+      feedback,
+      submittedAt,
+    }));
   [
     "evaluatorMarks",
     "thirdEvaluatorMark",
@@ -34,6 +44,8 @@ const sanitizeForStudent = (source) => {
     "evaluationThreshold",
     "resultPublishedBy",
   ].forEach((field) => delete data[field]);
+
+  if (evaluatorFeedback.length) data.evaluatorFeedback = evaluatorFeedback;
 
   const published =
     data.resultPublished === true && data.finalMarkStatus === "published";

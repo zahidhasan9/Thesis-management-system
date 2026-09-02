@@ -408,7 +408,8 @@ export default function AdminThesisDetails() {
                   <th className="p-3">Status</th>
                   <th className="p-3">Mark</th>
                   <th className="p-3">Submitted</th>
-                  <th className="p-3">Comment</th>
+                  <th className="p-3">Feedback</th>
+                  <th className="p-3">Recommendation</th>
                   <th className="p-3">Action</th>
                 </tr>
               </thead>
@@ -432,6 +433,9 @@ export default function AdminThesisDetails() {
                     </td>
                     <td className="max-w-xs p-3">
                       {assignment.feedback || "-"}
+                    </td>
+                    <td className="max-w-xs p-3">
+                      {assignment.recommendation || "-"}
                     </td>
                     <td className="p-3">
                       {assignment.markLocked && (
