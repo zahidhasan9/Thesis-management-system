@@ -16,7 +16,8 @@ import {
   FileUp,
   Pencil,
   CalendarDays,
-  StickyNote
+  StickyNote,
+  Sparkles,
 } from "lucide-react";
 
 export default function Profile() {
@@ -136,9 +137,9 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-        <div className="w-full max-w-md bg-white border border-gray-200 rounded-2xl shadow-sm px-8 py-8 text-center">
-          <div className="w-10 h-10 mx-auto border-4 border-gray-200 border-t-gray-700 rounded-full animate-spin mb-4"></div>
+      <div className="min-h-screen bg-gradient-to-br from-sky-50 via-indigo-50 to-violet-100 flex items-center justify-center px-4">
+        <div className="w-full max-w-md bg-white/90 border border-white rounded-3xl shadow-xl shadow-indigo-100 px-8 py-8 text-center">
+          <div className="w-10 h-10 mx-auto border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
           <h2 className="text-lg font-semibold text-gray-800">Loading profile...</h2>
           <p className="text-sm text-gray-500 mt-2">Please wait a moment.</p>
         </div>
@@ -147,41 +148,34 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-indigo-50 to-violet-100">
       <Navbar items={navItems} portal={"Student Portal"} />
 
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Student Portal</p>
-            <h1 className="text-2xl sm:text-3xl font-semibold text-gray-800">
-              My Profile
-            </h1>
-            <p className="text-sm text-gray-500 mt-2">
-              View and update your personal account information.
-            </p>
-          </div>
-
+        <section className="relative mb-6 overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-700 via-violet-700 to-fuchsia-700 px-6 py-7 text-white shadow-xl shadow-indigo-200 sm:px-8">
+          <div className="absolute -right-10 -top-12 h-44 w-44 rounded-full bg-white/10" />
+          <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold tracking-wide"><Sparkles size={14} /> STUDENT PROFILE</p><h1 className="mt-3 text-3xl font-bold">My Profile</h1><p className="mt-2 text-sm text-indigo-100">Keep your academic and contact information up to date.</p></div>
           <button
             onClick={() => navigate(-1)}
-            className="w-fit inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition shadow-sm"
+            className="w-fit inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20"
           >
             <ArrowLeft className="w-4 h-4" />
             Back
           </button>
-        </div>
+          </div>
+        </section>
 
         <div className="grid lg:grid-cols-3 gap-6">
           {/* Left */}
           <div className="lg:col-span-2 space-y-6">
             {/* Profile summary */}
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+            <div className="bg-white/90 border border-white rounded-3xl shadow-xl shadow-indigo-100/60 p-6">
               <div className="flex flex-col sm:flex-row sm:items-center gap-5">
                 <ProfilePhotoUploader user={user} onUpdated={setUser} />
 
                 <div className="flex-1 min-w-0">
-                  <h2 className="text-2xl font-semibold text-gray-900">
+                  <h2 className="text-2xl font-bold text-slate-900">
                     {user.name || "Student Name"}
                   </h2>
                   <p className="text-sm text-gray-500 mt-1 break-all">
@@ -189,10 +183,10 @@ export default function Profile() {
                   </p>
 
                   <div className="flex flex-wrap gap-2 mt-4">
-                    <span className="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-700 border border-gray-200">
+                    <span className="px-3 py-1 text-xs font-semibold rounded-full bg-violet-100 text-violet-700 border border-violet-200 capitalize">
                       {user.role || "Student"}
                     </span>
-                    <span className="px-3 py-1 text-xs rounded-full bg-gray-100 text-gray-700 border border-gray-200">
+                    <span className="px-3 py-1 text-xs font-semibold rounded-full bg-sky-100 text-sky-700 border border-sky-200">
                       ID: {user.idNo || "N/A"}
                     </span>
                   </div>
@@ -200,7 +194,7 @@ export default function Profile() {
 
                 <button
                   onClick={() => setEditMode(!editMode)}
-                  className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-black transition"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-200 transition hover:-translate-y-0.5"
                 >
                   <Pencil className="w-4 h-4" />
                   {editMode ? "Close Edit" : "Edit Profile"}
@@ -209,8 +203,8 @@ export default function Profile() {
             </div>
 
             {/* Profile details */}
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-5">
+            <div className="bg-white/90 border border-white rounded-3xl shadow-xl shadow-indigo-100/60 p-6">
+              <h3 className="text-lg font-bold text-slate-800 mb-5">
                 Personal Information
               </h3>
 
@@ -218,7 +212,7 @@ export default function Profile() {
                 {profileItems.map((item, index) => (
                   <div
                     key={index}
-                    className="bg-gray-50 border border-gray-200 rounded-xl p-4"
+                    className="bg-slate-50 border border-slate-100 rounded-2xl p-4 transition hover:border-indigo-100 hover:bg-indigo-50/50"
                   >
                     <div className="flex items-center gap-2 mb-2">
                       {item.icon}
@@ -233,12 +227,12 @@ export default function Profile() {
             </div>
 
             {/* Info note */}
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            <div className="bg-indigo-950 rounded-3xl shadow-xl shadow-indigo-200 p-6 text-white">
+              <h3 className="text-lg font-bold mb-4">
                 Account Note
               </h3>
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
-                <p className="text-sm text-gray-600 leading-7">
+              <div className="bg-white/10 border border-white/10 rounded-2xl p-4">
+                <p className="text-sm text-indigo-100 leading-7">
                   Keep your email, student ID, and phone number updated so your
                   thesis-related communication stays accurate.
                 </p>
@@ -249,8 +243,8 @@ export default function Profile() {
           {/* Right */}
           <div className="space-y-6">
             {/* Edit form */}
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+            <div className="bg-white/90 border border-white rounded-3xl shadow-xl shadow-indigo-100/60 p-6">
+              <h3 className="text-lg font-bold text-slate-800 mb-2">
                 Update Profile
               </h3>
               <p className="text-sm text-gray-500 mb-5">
@@ -268,7 +262,7 @@ export default function Profile() {
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       placeholder="Enter your full name"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
                     />
                   </div>
 
@@ -282,7 +276,7 @@ export default function Profile() {
                       value={idNo}
                       onChange={(e) => setIdNo(e.target.value)}
                       placeholder="Enter your student ID"
-                      className="w-full bg-gray-200  border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                      className="w-full bg-slate-100 border border-slate-200 rounded-xl px-3 py-2.5 text-sm"
                     />
                   </div>
                   <div>
@@ -292,7 +286,7 @@ export default function Profile() {
                     <DepartmentSelect
                       value={department}
                       onChange={(e) => setDepartment(e.target.value)}
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
                     />
                   </div>
                   <div>
@@ -304,7 +298,7 @@ export default function Profile() {
                       value={batch}
                       onChange={(e) => setBatch(e.target.value)}
                       placeholder="Enter your batch"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
                     />
                   </div>
                   <div>
@@ -316,7 +310,7 @@ export default function Profile() {
                       value={section}
                       onChange={(e) => setSection(e.target.value)}
                       placeholder="Enter your section"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
                     />
                   </div>
 
@@ -329,7 +323,7 @@ export default function Profile() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="Enter your phone number"
-                      className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                      className="w-full border border-slate-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
                     />
                   </div>
 
@@ -343,35 +337,35 @@ export default function Profile() {
                       disabled
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Enter your email"
-                      className="w-full border bg-gray-200 border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+                      className="w-full border bg-slate-100 border-slate-200 rounded-xl px-3 py-2.5 text-sm"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={saving}
-                    className="w-full bg-green-600 text-white py-2.5 rounded-lg text-sm font-medium hover:bg-green-700 transition disabled:opacity-70"
+                    className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white py-3 rounded-xl text-sm font-semibold shadow-lg shadow-indigo-200 hover:from-indigo-700 hover:to-violet-700 transition disabled:opacity-70"
                   >
                     {saving ? "Saving..." : "Save Changes"}
                   </button>
                 </form>
               ) : (
-                <div className="border border-gray-200 rounded-xl bg-gray-50 p-4 text-sm text-gray-600 leading-6">
+                <div className="border border-indigo-100 rounded-2xl bg-indigo-50/70 p-4 text-sm text-indigo-800 leading-6">
                   Click <span className="font-medium text-gray-800">Edit Profile</span> to update your information.
                 </div>
               )}
             </div>
 
             {/* Quick actions */}
-            <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            <div className="bg-white/90 border border-white rounded-3xl shadow-xl shadow-indigo-100/60 p-6">
+              <h3 className="text-lg font-bold text-slate-800 mb-4">
                 Quick Actions
               </h3>
 
               <div className="space-y-3">
                 <Link
                   to="/student"
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-black transition"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-slate-900 text-white rounded-xl hover:bg-indigo-700 transition"
                 >
                   <LayoutDashboard className="w-4 h-4" />
                   Go to Dashboard
@@ -379,7 +373,7 @@ export default function Profile() {
 
                 <Link
                   to="/upload"
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-50 border border-indigo-100 text-indigo-700 rounded-xl hover:bg-indigo-100 transition"
                 >
                   <FileUp className="w-4 h-4" />
                   Upload Thesis

@@ -341,11 +341,8 @@ export default function UploadThesis() {
   const [description, setDescription] = useState("");
   const [aiScore, setAiScore] = useState("");
   const [plagiarismScore, setPlagiarismScore] = useState("");
-  const [aiCheckUrl, setAiCheckUrl] = useState("");
-  const [plagiarismCheckUrl, setPlagiarismCheckUrl] = useState("");
   const [file, setFile] = useState(null);
-  const [aiReportFile, setAiReportFile] = useState(null);
-  const [plagiarismReportFile, setPlagiarismReportFile] = useState(null);
+  const [verificationReportFile, setVerificationReportFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -444,20 +441,6 @@ export default function UploadThesis() {
       return;
     }
 
-    const isValidReferenceUrl = (value) => {
-      try {
-        const url = new URL(value);
-        return url.protocol === "http:" || url.protocol === "https:";
-      } catch {
-        return false;
-      }
-    };
-
-    if (!isValidReferenceUrl(aiCheckUrl) || !isValidReferenceUrl(plagiarismCheckUrl)) {
-      toast.error("Please provide valid AI and plagiarism reference links");
-      return;
-    }
-
     if (file.type !== "application/pdf") {
       toast.error("Only PDF files are allowed");
       return;
@@ -473,10 +456,9 @@ export default function UploadThesis() {
       formData.append("description", description);
       formData.append("aiScore", String(parsedAiScore));
       formData.append("plagiarismScore", String(parsedPlagiarismScore));
-      formData.append("aiCheckUrl", aiCheckUrl.trim());
-      formData.append("plagiarismCheckUrl", plagiarismCheckUrl.trim());
-      if (aiReportFile) formData.append("aiReportPdf", aiReportFile);
-      if (plagiarismReportFile) formData.append("plagiarismReportPdf", plagiarismReportFile);
+      if (verificationReportFile) {
+        formData.append("verificationReportPdf", verificationReportFile);
+      }
 
       await axios.post("/student/upload", formData, {
         onUploadProgress: (progressEvent) => {
@@ -496,11 +478,8 @@ export default function UploadThesis() {
       setDescription("");
       setAiScore("");
       setPlagiarismScore("");
-      setAiCheckUrl("");
-      setPlagiarismCheckUrl("");
       setFile(null);
-      setAiReportFile(null);
-      setPlagiarismReportFile(null);
+      setVerificationReportFile(null);
       setUploadProgress(0);
 
       loadSubmissionStatus();
@@ -521,7 +500,6 @@ export default function UploadThesis() {
     Number(aiScore) < 25 &&
     Number(plagiarismScore) >= 0 &&
     Number(plagiarismScore) < 25;
-  const linksArePresent = aiCheckUrl.trim() !== "" && plagiarismCheckUrl.trim() !== "";
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -725,22 +703,8 @@ export default function UploadThesis() {
                 </div>
               </div>
 
-              <div className="mb-5 grid gap-4 sm:grid-cols-2">
-                <ReportUpload label="AI Report PDF (optional)" file={aiReportFile} disabled={disableForm} onChange={setAiReportFile} />
-                <ReportUpload label="Plagiarism Report PDF (optional)" file={plagiarismReportFile} disabled={disableForm} onChange={setPlagiarismReportFile} />
-              </div>
-
-              <div className="mb-5 grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">AI Checker Reference Link</label>
-                  <input className="w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100" disabled={disableForm} onChange={(event) => setAiCheckUrl(event.target.value)} placeholder="https://example.com/ai-report" required type="url" value={aiCheckUrl} />
-                  <p className="mt-1 text-xs text-gray-500">Link to the website or report used for the AI score.</p>
-                </div>
-                <div>
-                  <label className="mb-2 block text-sm font-medium text-gray-700">Plagiarism Checker Reference Link</label>
-                  <input className="w-full rounded-lg border border-gray-300 bg-white px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:bg-gray-100" disabled={disableForm} onChange={(event) => setPlagiarismCheckUrl(event.target.value)} placeholder="https://example.com/plagiarism-report" required type="url" value={plagiarismCheckUrl} />
-                  <p className="mt-1 text-xs text-gray-500">Link to the website or report used for the plagiarism score.</p>
-                </div>
+              <div className="mb-5">
+                <ReportUpload label="AI & Plagiarism Report PDF (optional)" file={verificationReportFile} disabled={disableForm} onChange={setVerificationReportFile} />
               </div>
 
               {/* File upload */}
@@ -851,9 +815,9 @@ export default function UploadThesis() {
               <div className="flex flex-col sm:flex-row gap-3 pt-6">
                 <button
                   onClick={upload}
-                  disabled={!title || !file || !scoresAreValid || !linksArePresent || disableForm}
+                  disabled={!title || !file || !scoresAreValid || disableForm}
                   className={`flex-1 py-3 rounded-lg text-sm font-medium text-white transition ${
-                    !title || !file || !scoresAreValid || !linksArePresent || disableForm
+                    !title || !file || !scoresAreValid || disableForm
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-gray-900 hover:bg-black"
                   }`}

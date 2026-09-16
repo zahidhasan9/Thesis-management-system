@@ -13,52 +13,52 @@ export default function AdminStatsCards({
 }) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-5 gap-4">
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+      <div className="rounded-2xl border border-indigo-100 bg-white/90 p-5 shadow-lg shadow-indigo-100/60">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-gray-500">Total Students</span>
-          <Users className="w-5 h-5 text-gray-400" />
+          <span className="text-sm font-medium text-gray-500">Total Students</span>
+          <span className="rounded-xl bg-indigo-100 p-2 text-indigo-600"><Users className="w-5 h-5" /></span>
         </div>
-        <h2 className="text-2xl font-semibold text-gray-900">
+        <h2 className="text-3xl font-bold text-slate-900">
           {stats.totalStudents || 0}
         </h2>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+      <div className="rounded-2xl border border-amber-100 bg-white/90 p-5 shadow-lg shadow-amber-100/60">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-gray-500">Pending Thesis</span>
-          <Clock3 className="w-5 h-5 text-yellow-500" />
+          <span className="text-sm font-medium text-gray-500">Pending Thesis</span>
+          <span className="rounded-xl bg-amber-100 p-2 text-amber-600"><Clock3 className="w-5 h-5" /></span>
         </div>
-        <h2 className="text-2xl font-semibold text-yellow-700">
+        <h2 className="text-3xl font-bold text-amber-700">
           {stats.pending || 0}
         </h2>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+      <div className="rounded-2xl border border-emerald-100 bg-white/90 p-5 shadow-lg shadow-emerald-100/60">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-gray-500">Completed</span>
-          <CheckCircle2 className="w-5 h-5 text-green-500" />
+          <span className="text-sm font-medium text-gray-500">Completed</span>
+          <span className="rounded-xl bg-emerald-100 p-2 text-emerald-600"><CheckCircle2 className="w-5 h-5" /></span>
         </div>
-        <h2 className="text-2xl font-semibold text-green-700">
+        <h2 className="text-3xl font-bold text-emerald-700">
           {stats.completed || 0}
         </h2>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+      <div className="rounded-2xl border border-rose-100 bg-white/90 p-5 shadow-lg shadow-rose-100/60">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-gray-500">Declined Thesis</span>
-          <XCircle className="w-5 h-5 text-red-500" />
+          <span className="text-sm font-medium text-gray-500">Declined Thesis</span>
+          <span className="rounded-xl bg-rose-100 p-2 text-rose-600"><XCircle className="w-5 h-5" /></span>
         </div>
-        <h2 className="text-2xl font-semibold text-red-700">
+        <h2 className="text-3xl font-bold text-rose-700">
           {declinedCount || 0}
         </h2>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+      <div className="rounded-2xl border border-sky-100 bg-white/90 p-5 shadow-lg shadow-sky-100/60">
         <div className="flex items-center justify-between mb-4">
-          <span className="text-sm text-gray-500">Total Thesis</span>
-          <FileText className="w-5 h-5 text-blue-500" />
+          <span className="text-sm font-medium text-gray-500">Total Thesis</span>
+          <span className="rounded-xl bg-sky-100 p-2 text-sky-600"><FileText className="w-5 h-5" /></span>
         </div>
-        <h2 className="text-2xl font-semibold text-blue-700">
+        <h2 className="text-3xl font-bold text-sky-700">
           {thesisCount || 0}
         </h2>
       </div>

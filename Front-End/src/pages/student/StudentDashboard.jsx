@@ -317,6 +317,9 @@ import {
   ChevronLeft,
   ChevronRight,
   LibraryBig,
+  Sparkles,
+  GraduationCap,
+  ArrowRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { fileUrl } from "../../config/api";
@@ -506,30 +509,30 @@ export default function StudentDashboard() {
   const navItems = [];
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-gradient-to-br from-sky-50 via-indigo-50 to-violet-100">
       <Navbar items={navItems} portal={"Student Portal"} />
       <Toaster position="top-right" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-8">
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Dashboard Overview</p>
+        <section className="relative mb-8 overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-700 via-violet-700 to-fuchsia-700 px-6 py-8 text-white shadow-xl shadow-indigo-200 sm:px-8">
+          <div className="absolute -right-10 -top-12 h-48 w-48 rounded-full bg-white/10" />
+          <div className="absolute bottom-0 right-28 h-24 w-24 rounded-full bg-cyan-300/20" />
+          <div className="relative flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="mb-2 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold tracking-wide text-indigo-50">
+                <Sparkles className="h-3.5 w-3.5" /> STUDENT WORKSPACE
+              </p>
+              <h1 className="text-3xl font-bold tracking-tight sm:text-4xl">My Thesis Dashboard</h1>
+              <p className="mt-3 max-w-xl text-sm leading-6 text-indigo-100">
+                Follow your submission progress, manage documents, and explore recent research ideas.
+              </p>
+            </div>
 
-            <h1 className="text-3xl font-semibold text-gray-800">
-              My Thesis Dashboard
-            </h1>
-
-            <p className="text-sm text-gray-500 mt-2">
-              Track your thesis submission and explore previous thesis for
-              research ideas.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap gap-3">
             <Link
               to="/upload"
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-900 text-white rounded-lg hover:bg-black transition"
+              className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-3 text-sm font-semibold text-indigo-700 shadow-lg transition hover:-translate-y-0.5 hover:bg-indigo-50"
             >
               <FileUp className="w-4 h-4" />
               Upload Thesis
@@ -537,65 +540,67 @@ export default function StudentDashboard() {
 
             <Link
               to="/profile"
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/30 bg-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/20"
             >
               <UserCircle2 className="w-4 h-4" />
               Profile
             </Link>
+            </div>
           </div>
-        </div>
+        </section>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+        <div className="grid grid-cols-2 gap-4 mb-8 lg:grid-cols-4">
+          <div className="rounded-2xl border border-indigo-100 bg-white/90 p-5 shadow-lg shadow-indigo-100/60 backdrop-blur">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-gray-500">Total Thesis</span>
-              <LayoutDashboard className="w-5 h-5 text-gray-400" />
+              <span className="text-sm font-medium text-slate-500">Total Thesis</span>
+              <span className="rounded-xl bg-indigo-100 p-2 text-indigo-600"><LayoutDashboard className="w-5 h-5" /></span>
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900">
+            <h2 className="text-3xl font-bold text-slate-900">
               {stats.total}
             </h2>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+          <div className="rounded-2xl border border-amber-100 bg-white/90 p-5 shadow-lg shadow-amber-100/60 backdrop-blur">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-gray-500">Pending</span>
-              <Clock3 className="w-5 h-5 text-yellow-500" />
+              <span className="text-sm font-medium text-slate-500">Pending</span>
+              <span className="rounded-xl bg-amber-100 p-2 text-amber-600"><Clock3 className="w-5 h-5" /></span>
             </div>
-            <h2 className="text-2xl font-semibold text-yellow-700">
+            <h2 className="text-3xl font-bold text-amber-700">
               {stats.pending}
             </h2>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+          <div className="rounded-2xl border border-emerald-100 bg-white/90 p-5 shadow-lg shadow-emerald-100/60 backdrop-blur">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-gray-500">Accepted</span>
-              <CheckCircle2 className="w-5 h-5 text-green-500" />
+              <span className="text-sm font-medium text-slate-500">Accepted</span>
+              <span className="rounded-xl bg-emerald-100 p-2 text-emerald-600"><CheckCircle2 className="w-5 h-5" /></span>
             </div>
-            <h2 className="text-2xl font-semibold text-green-700">
+            <h2 className="text-3xl font-bold text-emerald-700">
               {stats.accepted}
             </h2>
           </div>
 
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5">
+          <div className="rounded-2xl border border-sky-100 bg-white/90 p-5 shadow-lg shadow-sky-100/60 backdrop-blur">
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm text-gray-500">Completed</span>
-              <FileText className="w-5 h-5 text-blue-500" />
+              <span className="text-sm font-medium text-slate-500">Completed</span>
+              <span className="rounded-xl bg-sky-100 p-2 text-sky-600"><GraduationCap className="w-5 h-5" /></span>
             </div>
-            <h2 className="text-2xl font-semibold text-blue-700">
+            <h2 className="text-3xl font-bold text-sky-700">
               {stats.completed}
             </h2>
           </div>
         </div>
 
         {/* My Thesis */}
-        <div className="mb-4">
-          <h2 className="text-xl font-semibold text-gray-800">
+        <div className="mb-4 flex items-end justify-between gap-4">
+          <div><h2 className="text-xl font-bold text-slate-800">
             My Thesis List
           </h2>
           <p className="text-sm text-gray-500 mt-1">
             Your submitted thesis records are shown below.
-          </p>
+          </p></div>
+          <span className="hidden rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 sm:inline-flex">{stats.total} submission{stats.total === 1 ? "" : "s"}</span>
         </div>
 
         {thesis?.length > 0 ? (
@@ -603,12 +608,12 @@ export default function StudentDashboard() {
             {thesis.map((t) => (
               <div
                 key={t._id}
-                className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 flex flex-col"
+                className="group flex flex-col rounded-2xl border border-white bg-white/95 p-5 shadow-lg shadow-indigo-100/50 transition duration-200 hover:-translate-y-1 hover:shadow-xl"
               >
                 <div className="flex items-start justify-between gap-3 mb-4">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-2">
-                      <BookOpen className="w-5 h-5 text-gray-400 shrink-0" />
+                      <span className="rounded-lg bg-violet-100 p-2 text-violet-600"><BookOpen className="w-4 h-4 shrink-0" /></span>
                       <h3 className="text-lg font-semibold text-gray-900 truncate">
                         {t.title || "Untitled Thesis"}
                       </h3>
@@ -649,9 +654,9 @@ export default function StudentDashboard() {
                 <div className="mt-auto flex flex-col sm:flex-row gap-3">
                   <Link
                     to={`/student/thesis/${t._id}`}
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition"
+                    className="flex-1 inline-flex items-center justify-center gap-2 rounded-xl border border-indigo-200 bg-indigo-50 px-4 py-2.5 font-medium text-indigo-700 transition hover:bg-indigo-100"
                   >
-                    Details
+                    Details <ArrowRight className="h-4 w-4" />
                   </Link>
 
                   <button

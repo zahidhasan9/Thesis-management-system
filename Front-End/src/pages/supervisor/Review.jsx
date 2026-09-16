@@ -605,16 +605,13 @@ export default function ReviewPage() {
                   <p className="mt-1 text-xl font-semibold text-blue-900">
                     {thesis.aiScore == null ? "Not provided" : `${thesis.aiScore}%`}
                   </p>
-                  {thesis.aiCheckUrl && <a className="mt-2 inline-block text-xs font-semibold text-blue-700 underline" href={thesis.aiCheckUrl} rel="noreferrer" target="_blank">Open reference</a>}
-                  {thesis.aiReportPdf && <a className="mt-2 ml-3 inline-block text-xs font-semibold text-blue-700 underline" href={fileUrl(thesis.aiReportPdf)} rel="noreferrer" target="_blank">View report PDF</a>}
+                  {(thesis.verificationReportPdf || thesis.aiReportPdf || thesis.plagiarismReportPdf) && <a className="mt-2 ml-3 inline-block text-xs font-semibold text-blue-700 underline" href={fileUrl(thesis.verificationReportPdf || thesis.aiReportPdf || thesis.plagiarismReportPdf)} rel="noreferrer" target="_blank">View combined report PDF</a>}
                 </div>
                 <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-4">
                   <p className="text-xs font-medium text-emerald-600">Plagiarism Score</p>
                   <p className="mt-1 text-xl font-semibold text-emerald-900">
                     {thesis.plagiarismScore == null ? "Not provided" : `${thesis.plagiarismScore}%`}
                   </p>
-                  {thesis.plagiarismCheckUrl && <a className="mt-2 inline-block text-xs font-semibold text-emerald-700 underline" href={thesis.plagiarismCheckUrl} rel="noreferrer" target="_blank">Open reference</a>}
-                  {thesis.plagiarismReportPdf && <a className="mt-2 ml-3 inline-block text-xs font-semibold text-emerald-700 underline" href={fileUrl(thesis.plagiarismReportPdf)} rel="noreferrer" target="_blank">View report PDF</a>}
                 </div>
               </div>
 

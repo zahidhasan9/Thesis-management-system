@@ -251,10 +251,7 @@ export default function AdminThesisDetails() {
             <Info label="Plagiarism Score" value={thesis.plagiarismScore == null ? "Not provided" : `${thesis.plagiarismScore}%`} />
           </div>
           <div className="mt-3 flex flex-wrap gap-3 text-sm">
-            {thesis.aiCheckUrl && <a className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 font-medium text-blue-700 hover:bg-blue-100" href={thesis.aiCheckUrl} rel="noreferrer" target="_blank">Open AI Check Reference</a>}
-            {thesis.aiReportPdf && <a className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 font-medium text-blue-700 hover:bg-blue-100" href={fileUrl(thesis.aiReportPdf)} rel="noreferrer" target="_blank">View AI Report PDF</a>}
-            {thesis.plagiarismCheckUrl && <a className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 font-medium text-emerald-700 hover:bg-emerald-100" href={thesis.plagiarismCheckUrl} rel="noreferrer" target="_blank">Open Plagiarism Reference</a>}
-            {thesis.plagiarismReportPdf && <a className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 font-medium text-emerald-700 hover:bg-emerald-100" href={fileUrl(thesis.plagiarismReportPdf)} rel="noreferrer" target="_blank">View Plagiarism Report PDF</a>}
+            {(thesis.verificationReportPdf || thesis.aiReportPdf || thesis.plagiarismReportPdf) && <a className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 font-medium text-blue-700 hover:bg-blue-100" href={fileUrl(thesis.verificationReportPdf || thesis.aiReportPdf || thesis.plagiarismReportPdf)} rel="noreferrer" target="_blank">View AI & Plagiarism Report PDF</a>}
           </div>
         </section>
 

@@ -11,11 +11,11 @@ export default function EditRoleModal({
   if (!showModal) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl border border-gray-200">
-        <div className="flex items-center justify-between p-5 border-b border-gray-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/50 px-4 backdrop-blur-sm">
+      <div className="w-full max-w-md rounded-3xl border border-white bg-white shadow-2xl">
+        <div className="flex items-center justify-between border-b border-indigo-100 bg-gradient-to-r from-indigo-50 to-violet-50 p-5">
           <div>
-            <h2 className="text-lg font-semibold text-gray-800">
+            <h2 className="text-lg font-bold text-slate-800">
               Edit User Role
             </h2>
             <p className="text-sm text-gray-500 mt-1">
@@ -25,7 +25,7 @@ export default function EditRoleModal({
 
           <button
             onClick={closeModal}
-            className="p-2 rounded-lg hover:bg-gray-100 text-gray-500"
+            className="rounded-xl p-2 text-gray-500 hover:bg-white"
           >
             <X className="w-4 h-4" />
           </button>
@@ -39,7 +39,7 @@ export default function EditRoleModal({
           <select
             value={newRole}
             onChange={(e) => setNewRole(e.target.value)}
-            className="border border-gray-300 rounded-lg p-3 w-full mb-5 focus:outline-none focus:ring-2 focus:ring-gray-300"
+            className="mb-5 w-full rounded-xl border border-slate-200 p-3 focus:outline-none focus:ring-2 focus:ring-indigo-300"
           >
             <option value="supervisor">Supervisor</option>
             <option value="admin">Admin</option>
@@ -49,14 +49,14 @@ export default function EditRoleModal({
 
           <div className="flex justify-end gap-3">
             <button
-              className="bg-gray-100 px-4 py-2 rounded-lg hover:bg-gray-200 text-gray-700"
+              className="rounded-xl bg-slate-100 px-4 py-2 text-slate-700 hover:bg-slate-200"
               onClick={closeModal}
             >
               Cancel
             </button>
 
             <button
-              className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-black"
+              className="rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-4 py-2 text-white hover:from-indigo-700 hover:to-violet-700"
               onClick={saveRole}
             >
               Save Changes

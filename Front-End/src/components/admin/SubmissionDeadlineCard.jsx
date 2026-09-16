@@ -56,13 +56,13 @@ export default function SubmissionDeadlineCard() {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+    <div className="rounded-3xl border border-white bg-white/90 p-6 shadow-xl shadow-indigo-100/60">
       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <CalendarDays className="w-5 h-5 text-gray-600" />
+            <span className="rounded-xl bg-violet-100 p-2 text-violet-700"><CalendarDays className="w-5 h-5" /></span>
 
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-bold text-slate-800">
               Thesis Submission Deadline
             </h2>
           </div>
@@ -99,7 +99,7 @@ export default function SubmissionDeadlineCard() {
             type="datetime-local"
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300"
+            className="w-full border border-slate-200 rounded-xl px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
           />
         </div>
 
@@ -111,7 +111,7 @@ export default function SubmissionDeadlineCard() {
           <select
             value={isActive ? "active" : "inactive"}
             onChange={(e) => setIsActive(e.target.value === "active")}
-            className="w-full border border-gray-300 rounded-lg px-3 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-gray-300"
+            className="w-full border border-slate-200 rounded-xl px-3 py-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-300"
           >
             <option value="active">Active</option>
             <option value="inactive">Closed Manually</option>
@@ -122,7 +122,7 @@ export default function SubmissionDeadlineCard() {
       <button
         onClick={handleSave}
         disabled={loading}
-        className="mt-5 inline-flex items-center gap-2 px-5 py-3 bg-gray-900 text-white rounded-lg hover:bg-black transition disabled:bg-gray-400"
+        className="mt-5 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-3 text-white shadow-lg shadow-indigo-200 transition hover:from-indigo-700 hover:to-violet-700 disabled:bg-gray-400"
       >
         <Save className="w-4 h-4" />
         {loading ? "Saving..." : "Save Deadline"}

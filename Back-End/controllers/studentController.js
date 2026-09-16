@@ -22,8 +22,6 @@ exports.uploadThesis = async(req,res)=>{
  const plagiarismScoreInput = req.body.plagiarismScore;
  const aiScore = Number(aiScoreInput);
  const plagiarismScore = Number(plagiarismScoreInput);
- const aiCheckUrl = String(req.body.aiCheckUrl || "").trim();
- const plagiarismCheckUrl = String(req.body.plagiarismCheckUrl || "").trim();
 
  const files = uploadedFiles(req);
  const thesisPdf = req.files?.pdf?.[0];
@@ -43,22 +41,6 @@ exports.uploadThesis = async(req,res)=>{
   });
  }
 
- const isValidReferenceUrl = (value) => {
-  try {
-   const url = new URL(value);
-   return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-   return false;
-  }
- };
-
- if (!isValidReferenceUrl(aiCheckUrl) || !isValidReferenceUrl(plagiarismCheckUrl)) {
-  removeUploadedFiles(files);
-  return res.status(400).json({
-   message:"Valid AI and plagiarism reference links are required"
-  });
- }
-
  try {
   const thesis = await Thesis.create({
 
@@ -68,12 +50,8 @@ exports.uploadThesis = async(req,res)=>{
   description,
   aiScore,
   plagiarismScore,
-  aiCheckUrl,
-  plagiarismCheckUrl,
-
   pdf:thesisPdf.path,
-  aiReportPdf:req.files?.aiReportPdf?.[0]?.path,
-  plagiarismReportPdf:req.files?.plagiarismReportPdf?.[0]?.path,
+  verificationReportPdf:req.files?.verificationReportPdf?.[0]?.path,
 
   })
 

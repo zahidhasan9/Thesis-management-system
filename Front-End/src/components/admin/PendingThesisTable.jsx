@@ -1,8 +1,8 @@
 export default function PendingThesisTable({ pending }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
+    <div className="rounded-3xl border border-white bg-white/90 p-6 shadow-xl shadow-indigo-100/60">
       <div className="mb-5">
-        <h2 className="text-lg font-semibold text-gray-800">
+        <h2 className="text-lg font-bold text-slate-800">
           Pending Thesis Review
         </h2>
         <p className="text-sm text-gray-500 mt-1">
@@ -14,7 +14,7 @@ export default function PendingThesisTable({ pending }) {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="bg-gray-50 text-left">
+              <tr className="bg-indigo-50/70 text-left">
                 <th className="p-3 border-b text-sm font-semibold text-gray-700">
                   Student
                 </th>
@@ -28,7 +28,7 @@ export default function PendingThesisTable({ pending }) {
             </thead>
             <tbody>
               {pending.map((p) => (
-                <tr key={p._id} className="hover:bg-gray-50">
+                <tr key={p._id} className="transition hover:bg-indigo-50/50">
                   <td className="p-3 border-b text-sm text-gray-700">
                     {p.student?.name || "-"}
                   </td>

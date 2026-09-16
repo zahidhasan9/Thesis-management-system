@@ -16,6 +16,8 @@ const thesisSchema = new mongoose.Schema({
  plagiarismScore:{type:Number,min:0,validate:{validator:(value)=>value<25,message:"Plagiarism score must be less than 25%"}},
  aiCheckUrl:{type:String,trim:true},
  plagiarismCheckUrl:{type:String,trim:true},
+ verificationReportPdf:{type:String,trim:true},
+ // Kept temporarily so reports attached to older theses remain accessible.
  aiReportPdf:{type:String,trim:true},
  plagiarismReportPdf:{type:String,trim:true},
 

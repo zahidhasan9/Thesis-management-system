@@ -13,8 +13,7 @@ router.post(
   student.checkSubmissionDeadline,
   upload.fields([
     { name: "pdf", maxCount: 1 },
-    { name: "aiReportPdf", maxCount: 1 },
-    { name: "plagiarismReportPdf", maxCount: 1 },
+    { name: "verificationReportPdf", maxCount: 1 },
   ]),
   student.uploadThesis
 );

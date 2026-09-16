@@ -46,7 +46,7 @@ function UserTable({ title, description, users, idLabel, emptyMessage, openEditM
   const visibleUsers = useMemo(() => users.slice((safePage - 1) * pageSize, safePage * pageSize), [users, safePage]);
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <section className="overflow-hidden rounded-3xl border border-slate-100 bg-white shadow-lg shadow-indigo-100/50">
       <div className={`flex items-center justify-between border-b px-5 py-4 ${accent === "blue" ? "border-blue-100 bg-blue-50/70" : "border-violet-100 bg-violet-50/70"}`}>
         <div>
           <h3 className="font-semibold text-gray-800">{title}</h3>
@@ -116,12 +116,12 @@ export default function UsersSection({ search, setSearch, filteredUsers, openEdi
   ] : [];
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <div className="rounded-3xl border border-white bg-white/90 p-6 shadow-xl shadow-indigo-100/60">
       <div className="mb-5 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div><h2 className="text-xl font-semibold text-gray-800">User Management</h2><p className="mt-1 text-sm text-gray-500">Students are separated from all other user accounts.</p></div>
-        <div className="flex gap-2"><button className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm text-white hover:bg-green-700" onClick={onExportCSV}><FileSpreadsheet className="h-4 w-4" />CSV</button><button className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700" onClick={onExportPDF}><FileDown className="h-4 w-4" />PDF</button></div>
+        <div><h2 className="text-xl font-bold text-slate-800">User Management</h2><p className="mt-1 text-sm text-gray-500">Students are separated from all other user accounts.</p></div>
+        <div className="flex gap-2"><button className="inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-emerald-700" onClick={onExportCSV}><FileSpreadsheet className="h-4 w-4" />CSV</button><button className="inline-flex items-center gap-2 rounded-xl bg-rose-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-rose-700" onClick={onExportPDF}><FileDown className="h-4 w-4" />PDF</button></div>
       </div>
-      <div className="mb-5 flex flex-col gap-3 md:flex-row"><div className="relative flex-1"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" /><input className="w-full rounded-lg border border-gray-300 py-2.5 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" onChange={(event) => setSearch(event.target.value)} placeholder="Search by name, email, ID, role or status..." type="text" value={search} /></div><select className="rounded-lg border border-gray-300 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-gray-300" onChange={(event) => setDepartmentFilter(event.target.value)} value={departmentFilter}><option value="all">All Departments</option>{departments.map((department) => <option key={department} value={department}>{department}</option>)}</select></div>
+      <div className="mb-5 flex flex-col gap-3 md:flex-row"><div className="relative flex-1"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" /><input className="w-full rounded-xl border border-slate-200 py-2.5 pl-10 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" onChange={(event) => setSearch(event.target.value)} placeholder="Search by name, email, ID, role or status..." type="text" value={search} /></div><select className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300" onChange={(event) => setDepartmentFilter(event.target.value)} value={departmentFilter}><option value="all">All Departments</option>{departments.map((department) => <option key={department} value={department}>{department}</option>)}</select></div>
       <div className="mb-5 flex gap-2 overflow-x-auto border-b border-gray-200">
         <button
           className={`whitespace-nowrap border-b-2 px-5 py-3 text-sm font-semibold transition ${activeUserTab === "students" ? "border-blue-600 text-blue-700" : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-800"}`}

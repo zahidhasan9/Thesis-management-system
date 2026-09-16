@@ -14,9 +14,9 @@ import {
 export default function DashboardCharts({ chartData, pieData }) {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 h-[360px]">
+      <div className="h-[360px] rounded-3xl border border-white bg-white/90 p-5 shadow-xl shadow-indigo-100/60">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-bold text-slate-800">
             Monthly Thesis Submissions
           </h2>
         </div>
@@ -26,14 +26,14 @@ export default function DashboardCharts({ chartData, pieData }) {
             <XAxis dataKey="month" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="count" radius={[6, 6, 0, 0]} fill="#111827" />
+            <Bar dataKey="count" radius={[8, 8, 0, 0]} fill="#6366f1" />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-sm p-5 h-[360px]">
+      <div className="h-[360px] rounded-3xl border border-white bg-white/90 p-5 shadow-xl shadow-indigo-100/60">
         <div className="mb-4">
-          <h2 className="text-lg font-semibold text-gray-800">
+          <h2 className="text-lg font-bold text-slate-800">
             Thesis Status Overview
           </h2>
         </div>

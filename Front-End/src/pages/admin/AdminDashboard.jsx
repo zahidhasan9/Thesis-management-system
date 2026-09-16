@@ -1393,7 +1393,7 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50 to-violet-100">
       <Toaster position="top-right" />
 
       <AdminSidebar
