@@ -1,27 +1,28 @@
-import { NavLink } from "react-router-dom";
-import axios from "../api/axios"; 
+import { NavLink, useNavigate } from "react-router-dom";
+import axios from "../api/axios";
 import NotificationCenter from "./NotificationCenter";
 import LogoutAllButton from "./LogoutAllButton";
 
-
 export default function Navbar({ items, portal }) {
-const handleLogout = async () => {
-  try {
-    await axios.post("/auth/logout"); // call backend logout
-    localStorage.removeItem("user");  // remove user info
-    window.location.href = "/login";  // redirect to login
-  } catch (err) {
-    console.error("Logout failed", err);
-  }
-};
-//   const handleLogout = () => {
-//     // Remove token cookie
-//     Cookies.remove("token");
-//     // Remove user from localStorage
-//     localStorage.removeItem("user");
-//     // Redirect to login page
-//     navigate("/login");
-//   };
+  const navigate = useNavigate();
+  const handleLogout = async () => {
+    try {
+      await axios.post("/auth/logout"); // call backend logout
+    } catch (err) {
+      console.error("Logout failed", err);
+    } finally {
+      localStorage.removeItem("user");
+      navigate("/login", { replace: true });
+    }
+  };
+  //   const handleLogout = () => {
+  //     // Remove token cookie
+  //     Cookies.remove("token");
+  //     // Remove user from localStorage
+  //     localStorage.removeItem("user");
+  //     // Redirect to login page
+  //     navigate("/login");
+  //   };
 
   return (
     <nav className="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-50">
