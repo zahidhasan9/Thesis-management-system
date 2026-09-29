@@ -50,6 +50,33 @@ const notificationRoutes = require("./routes/notificationRoutes");
 const publicResultRoutes = require("./routes/publicResultRoutes");
 
 const app = express();
+let databaseConnectionPromise;
+
+app.set("trust proxy", 1);
+
+const connectToDatabase = () => {
+  if (mongoose.connection.readyState === 1) {
+    return Promise.resolve();
+  }
+
+  if (!process.env.MONGO_URI) {
+    return Promise.reject(new Error("MONGO_URI is not configured"));
+  }
+
+  if (!databaseConnectionPromise) {
+    databaseConnectionPromise = mongoose
+      .connect(process.env.MONGO_URI, { serverSelectionTimeoutMS: 10000 })
+      .then(() => {
+        databaseConnectionPromise = null;
+      })
+      .catch((error) => {
+        databaseConnectionPromise = null;
+        throw error;
+      });
+  }
+
+  return databaseConnectionPromise;
+};
 
 const allowedOrigins = (process.env.CLIENT_URL || "http://localhost:5173")
   .split(",")
@@ -79,6 +106,20 @@ app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 app.use(helmet());
 app.use(morgan("dev"));
+
+app.use("/api", async (req, res, next) => {
+  try {
+    await connectToDatabase();
+    next();
+  } catch (error) {
+    console.error("MongoDB connection failed:", error.message);
+    return res.status(503).json({
+      status: "degraded",
+      database: "disconnected",
+      message: "Database unavailable",
+    });
+  }
+});
 
 app.get("/api/health", (req, res) => {
   const databaseConnected = mongoose.connection.readyState === 1;

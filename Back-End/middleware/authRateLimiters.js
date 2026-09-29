@@ -1,9 +1,10 @@
-const { rateLimit } = require("express-rate-limit");
+const { rateLimit, ipKeyGenerator } = require("express-rate-limit");
 
 const createLimiter = ({ windowMs, limit, message }) =>
   rateLimit({
     windowMs,
     limit,
+    keyGenerator: (req) => ipKeyGenerator(req.ip),
     standardHeaders: "draft-8",
     legacyHeaders: false,
     message: { message },
@@ -36,7 +37,8 @@ const resetPasswordLimiter = createLimiter({
 const publicResultLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   limit: 20,
-  message: "Too many result lookup attempts. Please try again after 15 minutes.",
+  message:
+    "Too many result lookup attempts. Please try again after 15 minutes.",
 });
 
 module.exports = {
