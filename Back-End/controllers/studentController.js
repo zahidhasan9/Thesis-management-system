@@ -6,11 +6,12 @@ const { assignProjectId } = require("../services/projectId");
 const AuditLog = require("../models/AuditLog");
 const { recordAudit } = require("../utils/audit");
 const fs = require("fs");
+const { saveFile, removeFile } = require("../services/fileStorage");
 
 const uploadedFiles = (req) => Object.values(req.files || {}).flat();
 const removeUploadedFiles = (files) => {
   files.filter(Boolean).forEach((file) => {
-    if (file?.path) fs.promises.unlink(file.path).catch(() => undefined);
+    if (file?.path && !file.buffer) fs.promises.unlink(file.path).catch(() => undefined);
   });
 };
 
@@ -41,7 +42,19 @@ exports.uploadThesis = async(req,res)=>{
   });
  }
 
+ let storedThesisPdf;
+ let storedVerificationPdf;
  try {
+  storedThesisPdf = await saveFile(thesisPdf, { folder: "theses", resourceType: "raw" });
+  const verificationFile = req.files?.verificationReportPdf?.[0];
+  try {
+   storedVerificationPdf = verificationFile
+    ? await saveFile(verificationFile, { folder: "verification-reports", resourceType: "raw" })
+    : null;
+  } catch (error) {
+   await removeFile({ filePath: storedThesisPdf.path, publicId: storedThesisPdf.publicId });
+   throw error;
+  }
   const thesis = await Thesis.create({
 
   student:req.user._id,
@@ -50,8 +63,10 @@ exports.uploadThesis = async(req,res)=>{
   description,
   aiScore,
   plagiarismScore,
-  pdf:thesisPdf.path,
-  verificationReportPdf:req.files?.verificationReportPdf?.[0]?.path,
+  pdf:storedThesisPdf.path,
+  pdfPublicId:storedThesisPdf.publicId,
+  verificationReportPdf:storedVerificationPdf?.path,
+  verificationReportPdfPublicId:storedVerificationPdf?.publicId,
 
   })
 
@@ -65,6 +80,10 @@ exports.uploadThesis = async(req,res)=>{
 
   return res.status(201).json(thesis)
  } catch (error) {
+  await Promise.all([
+   removeFile({ filePath: storedThesisPdf?.path, publicId: storedThesisPdf?.publicId }),
+   removeFile({ filePath: storedVerificationPdf?.path, publicId: storedVerificationPdf?.publicId }),
+  ]);
   removeUploadedFiles(files);
   console.error("Thesis upload error:", error);
   return res.status(500).json({message:"Thesis upload failed"});
@@ -86,7 +105,9 @@ exports.myThesis = async(req,res)=>{
 
 exports.deleteThesis = async(req,res)=>{
 
- const thesis = await Thesis.findById(req.params.id)
+ const thesis = await Thesis.findById(req.params.id).select("+pdfPublicId +verificationReportPdfPublicId")
+
+ if (!thesis) return res.status(404).json({ message: "Thesis not found" });
 
  if(thesis.status==="accepted"){
   return res.json({
@@ -95,6 +116,10 @@ exports.deleteThesis = async(req,res)=>{
  }
 
  await Thesis.findByIdAndDelete(req.params.id)
+ await Promise.all([
+  removeFile({ filePath: thesis.pdf, publicId: thesis.pdfPublicId }),
+  removeFile({ filePath: thesis.verificationReportPdf, publicId: thesis.verificationReportPdfPublicId }),
+ ]);
 
  res.json({message:"Deleted"})
 

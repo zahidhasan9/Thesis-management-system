@@ -94,6 +94,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    profileImagePublicId: {
+      type: String,
+      trim: true,
+      select: false,
+    },
     batch: {
       type: String,
       trim: true,

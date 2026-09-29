@@ -1,17 +1,12 @@
-const fs = require("fs");
-const path = require("path");
 const User = require("../models/User");
+const { saveFile, removeFile } = require("../services/fileStorage");
 
-const uploadsRoot = path.resolve(__dirname, "..", "uploads");
-
-const removeManagedImage = async (relativePath) => {
-  if (!relativePath) return;
-  const absolutePath = path.resolve(__dirname, "..", relativePath);
-  const profileRoot = path.join(uploadsRoot, "profile") + path.sep;
-  if (!absolutePath.startsWith(profileRoot)) return;
-  await fs.promises.unlink(absolutePath).catch((error) => {
-    if (error.code !== "ENOENT") console.error("Profile image cleanup failed:", error.message);
-  });
+const removeManagedImage = async (filePath, publicId) => {
+  try {
+    await removeFile({ filePath, publicId, resourceType: "image" });
+  } catch (error) {
+    console.error("Profile image cleanup failed:", error.message);
+  }
 };
 
 const hasValidSignature = (buffer) => {
@@ -30,27 +25,27 @@ exports.uploadProfileImage = async (req, res) => {
   if (!req.file) return res.status(400).json({ message: "Select a profile image" });
 
   try {
-    const signature = await fs.promises.readFile(req.file.path).then((data) => data.subarray(0, 12));
+    const signature = req.file.buffer.subarray(0, 12);
     if (!hasValidSignature(signature)) {
-      await fs.promises.unlink(req.file.path).catch(() => undefined);
       return res.status(400).json({ message: "The uploaded file is not a valid image" });
     }
 
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select("+profileImagePublicId");
     if (!user) {
-      await fs.promises.unlink(req.file.path).catch(() => undefined);
       return res.status(404).json({ message: "User not found" });
     }
 
     const previousImage = user.profileImage;
-    user.profileImage = `uploads/profile/${req.file.filename}`;
+    const previousImagePublicId = user.profileImagePublicId;
+    const storedFile = await saveFile(req.file, { folder: "profile", resourceType: "image" });
+    user.profileImage = storedFile.path;
+    user.profileImagePublicId = storedFile.publicId;
     await user.save();
-    await removeManagedImage(previousImage);
+    await removeManagedImage(previousImage, previousImagePublicId);
 
     const safeUser = await User.findById(user._id).select("-password");
     return res.json({ message: "Profile picture updated", user: safeUser });
   } catch (error) {
-    await fs.promises.unlink(req.file.path).catch(() => undefined);
     console.error("Profile image upload failed:", error.message);
     return res.status(500).json({ message: "Could not update profile picture" });
   }
@@ -58,12 +53,14 @@ exports.uploadProfileImage = async (req, res) => {
 
 exports.removeProfileImage = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id);
+    const user = await User.findById(req.user._id).select("+profileImagePublicId");
     if (!user) return res.status(404).json({ message: "User not found" });
     const previousImage = user.profileImage;
+    const previousImagePublicId = user.profileImagePublicId;
     user.profileImage = undefined;
+    user.profileImagePublicId = undefined;
     await user.save();
-    await removeManagedImage(previousImage);
+    await removeManagedImage(previousImage, previousImagePublicId);
     const safeUser = await User.findById(user._id).select("-password");
     return res.json({ message: "Profile picture removed", user: safeUser });
   } catch (error) {

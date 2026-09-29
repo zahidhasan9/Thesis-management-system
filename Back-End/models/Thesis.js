@@ -44,6 +44,8 @@ const thesisSchema = new mongoose.Schema({
  },
 
  pdf:String,
+ pdfPublicId:{type:String,trim:true,select:false},
+ verificationReportPdfPublicId:{type:String,trim:true,select:false},
 
  status:{
   type:String,
